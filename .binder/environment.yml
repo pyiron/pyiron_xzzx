@@ -1,4 +1,7 @@
 channels:
 - conda-forge
 dependencies:
+- h5py
+- psycopg2
 - pyiron_workflow
+- sqlalchemy
