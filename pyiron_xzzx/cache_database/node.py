@@ -29,14 +29,14 @@ def store_node_outputs(node: Node) -> str:
 def restore_node_outputs(node: Node) -> bool:
     """
     Restore a node's outputs from a stored HDF5 file, given by node.hash.
-    
+
     Args:
         node: the node whose outputs should be restored.
-    
+
     Returns:
         True if the outputs were restored, False if not.
     """
-    
+
     node_hash = get_node_hash(node_to_dict(node))
     output_path = f".storage/{node_hash}.hdf5"
     with HDF5Storage(output_path, "r") as storage:
