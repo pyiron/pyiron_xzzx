@@ -2,8 +2,8 @@ import hashlib
 import json
 from typing import Any
 
-from pyiron_workflow.database.cache_database import CacheDatabase
-from pyiron_workflow.generic_storage import HDF5Storage
+from pyiron_xzzx.cache_database.cache_database import CacheDatabase
+from pyiron_xzzx.generic_storage import HDF5Storage
 from pyiron_workflow.node import Node
 from pyiron_workflow.workflow import Workflow
 

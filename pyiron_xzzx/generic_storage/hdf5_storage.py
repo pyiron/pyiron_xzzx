@@ -4,7 +4,7 @@ from typing import Any
 
 import h5py
 
-from pyiron_workflow.generic_storage import GenericStorage, StorageGroup
+from pyiron_xzzx.generic_storage import GenericStorage, StorageGroup
 
 
 class HDF5Storage(GenericStorage):

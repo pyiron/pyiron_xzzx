@@ -3,8 +3,8 @@ from __future__ import annotations
 import json
 from typing import Any
 
-from pyiron_workflow.generic_storage.interface import GenericStorage, StorageGroup
-from pyiron_workflow.generic_storage.dataclass_helpers import unwrap_dataclass
+from pyiron_xzzx.generic_storage.interface import GenericStorage, StorageGroup
+from pyiron_xzzx.generic_storage.dataclass_helpers import unwrap_dataclass
 from dataclasses import dataclass
 
 
