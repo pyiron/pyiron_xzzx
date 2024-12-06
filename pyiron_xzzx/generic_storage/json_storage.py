@@ -5,7 +5,7 @@ from typing import Any
 
 from pyiron_xzzx.generic_storage.interface import GenericStorage, StorageGroup
 from pyiron_xzzx.generic_storage.dataclass_helpers import unwrap_dataclass
-from dataclasses import dataclass
+from dataclasses import is_dataclass
 
 
 class JSONStorage(GenericStorage):
@@ -43,7 +43,7 @@ class JSONGroup(StorageGroup):
         return self.data[key]
 
     def __setitem__(self, key: str, value: Any):
-        if dataclass.is_dataclass(value):
+        if is_dataclass(value):
             group = self.create_group(key)
             unwrap_dataclass(group, value)
         self.data[key] = value
