@@ -1,11 +1,12 @@
 from __future__ import annotations
 
 import json
+from dataclasses import is_dataclass
 from typing import Any
 
-from pyiron_xzzx.generic_storage.interface import GenericStorage, StorageGroup
 from pyiron_xzzx.generic_storage.dataclass_helpers import unwrap_dataclass
-from dataclasses import is_dataclass
+from pyiron_xzzx.generic_storage.interface import GenericStorage, StorageGroup
+from pyiron_xzzx.obj_reconstruction.util import get_type, recreate_obj
 
 
 class JSONStorage(GenericStorage):
@@ -40,12 +41,29 @@ class JSONGroup(StorageGroup):
         del self.data[key]
 
     def __getitem__(self, key: str) -> Any:
+        if isinstance(self.data[key], dict):
+            group = JSONGroup(self.data[key])
+            type = group.get("_type", "group")
+            if type != "group":
+                module, qualname, version = type.split("@")
+                return recreate_obj(
+                    module,
+                    qualname,
+                    version,
+                    init_args={k: v for k, v in group.items() if k != "_type"},
+                )
+            return group
+
         return self.data[key]
 
     def __setitem__(self, key: str, value: Any):
         if is_dataclass(value):
-            group = self.create_group(key)
+            group = JSONGroup(self.create_group(key))
+            module, qualname, version = get_type(value)
+            group["_type"] = "@".join([module, qualname, version])
             unwrap_dataclass(group, value)
+            return
+
         self.data[key] = value
 
     def __iter__(self):
@@ -61,7 +79,9 @@ class JSONGroup(StorageGroup):
         return JSONGroup(self.data[key])
 
     def get(self, key: str, default: Any = None):
-        return self.data.get(key, default)
+        if key in self.data:
+            return self[key]
+        return default
 
     def require_group(self, key: str) -> JSONGroup:
         return JSONGroup(self.data[key])
