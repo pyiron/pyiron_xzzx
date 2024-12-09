@@ -19,7 +19,7 @@ def store_node_outputs(node: Node) -> str:
     Returns:
         str: The file path where the node's outputs are stored.
     """
-    node_hash = get_node_hash(node_to_dict(node))
+    node_hash = get_hash(node)
     output_path = f".storage/{node_hash}.hdf5"
     with HDF5Storage(output_path, "w") as storage:
         for k, v in node.outputs.items():
@@ -38,7 +38,7 @@ def restore_node_outputs(node: Node) -> bool:
         True if the outputs were restored, False if not.
     """
 
-    node_hash = get_node_hash(node_to_dict(node))
+    node_hash = get_hash(node)
     output_path = f".storage/{node_hash}.hdf5"
     with HDF5Storage(output_path, "r") as storage:
         for k, v in storage.items():
@@ -65,7 +65,7 @@ def node_to_dict(node: Node) -> dict:
     return node_dict
 
 
-def get_node_hash(obj_to_be_hashed: Node | dict) -> str:
+def get_hash(obj_to_be_hashed: Node | dict) -> str:
     node_dict = (
         obj_to_be_hashed
         if isinstance(obj_to_be_hashed, dict)
@@ -84,7 +84,7 @@ def node_inputs_to_dict(node: Node) -> dict[str, Any]:
     def resolve_connections(value: Any):
         if value.connected:
             return (
-                get_node_hash(value.connections[0].owner)
+                get_hash(value.connections[0].owner)
                 + "@"
                 + value.connections[0].label
             )
@@ -125,7 +125,7 @@ def store_node_in_database(
         str: The hash of the stored node.
     """
     node_dict = node_to_dict(node)
-    node_hash = get_node_hash(node_dict)
+    node_hash = get_hash(node_dict)
     output_path = None
     if store_outputs:
         output_path = store_node_outputs(node)
