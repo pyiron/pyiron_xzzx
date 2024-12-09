@@ -6,6 +6,7 @@ from pyiron_xzzx.cache_database.cache_database import CacheDatabase
 from pyiron_xzzx.generic_storage import HDF5Storage
 from pyiron_workflow.node import Node
 from pyiron_workflow.workflow import Workflow
+from pyiron_xzzx.obj_reconstruction.util import get_type, recreate_obj
 
 
 def store_node_outputs(node: Node) -> str:
@@ -45,33 +46,8 @@ def restore_node_outputs(node: Node) -> bool:
     return True
 
 
-def get_type(cls):
-    module = cls.__class__.__module__
-    qualname = cls.__class__.__qualname__
-    from importlib import import_module
-
-    base_module = import_module(module.split(".")[0])
-    version = (
-        base_module.__version__
-        if hasattr(base_module, "__version__")
-        else "not_defined"
-    )
-    return module, qualname, version
-
-
 def recreate_node(module: str, qualname: str, version: str, label: str) -> Node:
-    from importlib import import_module
-
-    base_module = import_module(module)
-    actual_version = (
-        base_module.__version__
-        if hasattr(base_module, "__version__")
-        else "not_defined"
-    )
-    if actual_version != version:
-        raise ValueError(f"Version mismatch: {version} != {actual_version}")
-    node = getattr(base_module, qualname)(label=label)
-    return node
+    return recreate_obj(module, qualname, version, {label: label})
 
 
 def node_to_dict(node: Node) -> dict:
