@@ -47,7 +47,7 @@ def restore_node_outputs(node: Node) -> bool:
 
 
 def recreate_node(module: str, qualname: str, version: str, label: str) -> Node:
-    return recreate_obj(module, qualname, version, {label: label})
+    return recreate_obj(module, qualname, version, {"label": label})
 
 
 def node_to_dict(node: Node) -> dict:
