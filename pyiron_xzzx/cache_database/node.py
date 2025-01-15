@@ -2,10 +2,12 @@ import hashlib
 import json
 from typing import Any
 
-from pyiron_xzzx.cache_database.cache_database import CacheDatabase
-from pyiron_xzzx.generic_storage import HDF5Storage
+from pyiron_workflow import NOT_DATA
 from pyiron_workflow.node import Node
 from pyiron_workflow.workflow import Workflow
+
+from pyiron_xzzx.cache_database.cache_database import CacheDatabase
+from pyiron_xzzx.generic_storage import HDF5Storage
 from pyiron_xzzx.obj_reconstruction.util import get_type, recreate_obj
 
 
@@ -25,6 +27,8 @@ def store_node_outputs(node: Node) -> str:
         for k, v in node.outputs.items():
             if v.value == v.default:
                 continue
+            if v.value is NOT_DATA:
+                raise ValueError(f"Output '{k}' has no value.")
             storage[k] = v.value
     return output_path
 
@@ -86,9 +90,7 @@ def node_inputs_to_dict(node: Node) -> dict[str, Any]:
     def resolve_connections(value: Any):
         if value.connected:
             return (
-                get_hash(value.connections[0].owner)
-                + "@"
-                + value.connections[0].label
+                get_hash(value.connections[0].owner) + "@" + value.connections[0].label
             )
         else:
             return str(value)
@@ -199,6 +201,6 @@ def restore_node_from_database(
             input_node = restore_node_from_database(db, input_hash, parent)
             node.inputs[k].connect(input_node.outputs[input_label])
         else:
-            node.inputs[k] = node.inputs[k].type_hint(v)
+            node.inputs[k] = v
 
     return node
