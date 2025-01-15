@@ -13,10 +13,6 @@ class StorageGroup(abc.ABC, MutableMapping[str, Any]):
         pass
 
     @abc.abstractmethod
-    def get(self, key: str, default: Any = None):
-        pass
-
-    @abc.abstractmethod
     def require_group(self, key: str) -> StorageGroup:
         pass
 
