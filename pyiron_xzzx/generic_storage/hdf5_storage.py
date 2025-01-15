@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import is_dataclass
-from typing import Any
+from typing import Any, Iterator
 
 import h5py
 
@@ -30,7 +30,7 @@ class HDF5Group(StorageGroup):
     def __init__(self, data: h5py.File):
         self.data = data
 
-    def __contains__(self, item: object):
+    def __contains__(self, item: object) -> bool:
         return item in self.data
 
     def __delitem__(self, key: str):
@@ -68,6 +68,7 @@ class HDF5Group(StorageGroup):
             group["_type"] = "@".join([module, qualname, version])
             unwrap_dataclass(group, value)
             return
+
         try:
             self.data[key] = value
         except TypeError as type_error:
@@ -75,10 +76,10 @@ class HDF5Group(StorageGroup):
                 f"'{key}' of type {type(value)} cannot be written to HDF5."
             ) from type_error
 
-    def __iter__(self):
+    def __iter__(self) -> Iterator[str]:
         return iter(self.data)
 
-    def __len__(self):
+    def __len__(self) -> int:
         return len(self.data)
 
     def create_group(self, key: str) -> HDF5Group:
