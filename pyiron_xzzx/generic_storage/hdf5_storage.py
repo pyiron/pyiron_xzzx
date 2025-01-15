@@ -68,8 +68,12 @@ class HDF5Group(StorageGroup):
             group["_type"] = "@".join([module, qualname, version])
             unwrap_dataclass(group, value)
             return
-
-        self.data[key] = value
+        try:
+            self.data[key] = value
+        except TypeError as type_error:
+            raise TypeError(
+                f"'{key}' of type {type(value)} cannot be written to HDF5."
+            ) from type_error
 
     def __iter__(self):
         return iter(self.data)
