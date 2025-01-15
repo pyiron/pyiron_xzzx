@@ -23,6 +23,8 @@ def store_node_outputs(node: Node) -> str:
     output_path = f".storage/{node_hash}.hdf5"
     with HDF5Storage(output_path, "w") as storage:
         for k, v in node.outputs.items():
+            if v.value == v.default:
+                continue
             storage[k] = v.value
     return output_path
 
@@ -91,7 +93,11 @@ def node_inputs_to_dict(node: Node) -> dict[str, Any]:
         else:
             return str(value)
 
-    output = {k: resolve_connections(v) for k, v in node.inputs.items()}
+    output = {
+        k: resolve_connections(v)
+        for k, v in node.inputs.items()
+        if v.value != v.default
+    }
 
     return output
 
