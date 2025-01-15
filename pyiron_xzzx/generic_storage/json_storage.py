@@ -15,7 +15,7 @@ class JSONStorage(GenericStorage):
         self.file = open(filename, mode)
         self.data: dict = {}
 
-    def close(self):
+    def _close(self):
         self.file.close()
 
     def __enter__(self) -> JSONGroup:
@@ -27,7 +27,7 @@ class JSONStorage(GenericStorage):
     def __exit__(self, exc_type, exc_value, traceback):
         if self.file.writable():
             self.file.write(json.dumps(self.data))
-        self.close()
+        self._close()
 
 
 class JSONGroup(StorageGroup):
@@ -58,7 +58,7 @@ class JSONGroup(StorageGroup):
 
     def __setitem__(self, key: str, value: Any):
         if is_dataclass(value):
-            group = JSONGroup(self.create_group(key))
+            group = self.create_group(key)
             module, qualname, version = get_type(value)
             group["_type"] = "@".join([module, qualname, version])
             unwrap_dataclass(group, value)
@@ -67,7 +67,7 @@ class JSONGroup(StorageGroup):
         import numpy
 
         if isinstance(value, numpy.ndarray):
-            group = JSONGroup(self.create_group(key))
+            group = self.create_group(key)
             module, qualname, version = get_type(value)
             group["_type"] = "@".join(
                 [module, qualname.replace("ndarray", "array"), version]
@@ -88,11 +88,6 @@ class JSONGroup(StorageGroup):
             raise KeyError(f"{key} already exists")
         self.data[key] = {}
         return JSONGroup(self.data[key])
-
-    def get(self, key: str, default: Any = None):
-        if key in self.data:
-            return self[key]
-        return default
 
     def require_group(self, key: str) -> JSONGroup:
         return JSONGroup(self.data[key])

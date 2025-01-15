@@ -16,14 +16,14 @@ class HDF5Storage(GenericStorage):
         self.file = h5py.File(filename, mode)
         self.data = self.file
 
-    def close(self):
+    def _close(self):
         self.file.close()
 
     def __enter__(self) -> HDF5Group:
         return HDF5Group(self.data)
 
     def __exit__(self, exc_type, exc_value, traceback):
-        self.close()
+        self._close()
 
 
 class HDF5Group(StorageGroup):
@@ -84,11 +84,6 @@ class HDF5Group(StorageGroup):
 
     def create_group(self, key: str) -> HDF5Group:
         return self.data.create_group(key)
-
-    def get(self, key: str, default: Any = None) -> Any:
-        if key in self.data:
-            return self[key]
-        return default
 
     def require_group(self, key: str) -> HDF5Group:
         return self.data.require_group(key)
