@@ -64,6 +64,17 @@ class JSONGroup(StorageGroup):
             unwrap_dataclass(group, value)
             return
 
+        import numpy
+
+        if isinstance(value, numpy.ndarray):
+            group = JSONGroup(self.create_group(key))
+            module, qualname, version = get_type(value)
+            group["_type"] = "@".join(
+                [module, qualname.replace("ndarray", "array"), version]
+            )
+            group["object"] = value.tolist()
+            return
+
         self.data[key] = value
 
     def __iter__(self):
