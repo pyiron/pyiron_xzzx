@@ -181,6 +181,8 @@ def restore_node_from_database(
     """
     # restore node
     db_result = db.read(node_hash)
+    if db_result is None:
+        raise RuntimeError(f"Node with hash {node_hash} not found in database.")
 
     node = recreate_node(
         module=db_result.module,
