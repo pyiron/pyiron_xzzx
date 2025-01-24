@@ -1,9 +1,13 @@
 from __future__ import annotations
 
+from dataclasses import dataclass
 import enum
+from typing import Optional
 
 from sqlalchemy import Column, Enum, Integer, MetaData, String, Table, create_engine
 from sqlalchemy.dialects.postgresql import JSONB
+
+from pyiron_xzzx.generic_storage import JSONString
 
 
 class OutputState(enum.Enum):
@@ -13,6 +17,17 @@ class OutputState(enum.Enum):
 
 
 class CacheDatabase:
+    @dataclass
+    class NodeData:
+        hash: str
+        label: str
+        qualname: str
+        module: str
+        version: str
+        connected_inputs: dict
+        inputs: dict
+        output_path: str
+        
     def __init__(self, connection_string: str, echo: bool = False):
         self.metadata = MetaData()
         self.table = Table(
@@ -65,11 +80,11 @@ class CacheDatabase:
             connection.commit()
             return result.inserted_primary_key[0]
 
-    def read(self, hash: str):
+    def read(self, hash: str) -> NodeData | None:
         with self.engine.connect() as connection:
             stmt = self.table.select().where(self.table.c.hash == hash)
-            result = connection.execute(stmt)
-            return result.first()
+            result = connection.execute(stmt).first()
+            return result
 
     def update(self, hash, **kwargs):
         with self.engine.connect() as connection:

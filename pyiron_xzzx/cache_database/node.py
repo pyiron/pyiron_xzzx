@@ -7,7 +7,7 @@ from pyiron_workflow.node import Node
 from pyiron_workflow.workflow import Workflow
 
 from pyiron_xzzx.cache_database.cache_database import CacheDatabase
-from pyiron_xzzx.generic_storage import HDF5Storage
+from pyiron_xzzx.generic_storage import HDF5Storage, JSONGroup
 from pyiron_xzzx.obj_reconstruction.util import get_type, recreate_obj
 
 
@@ -56,28 +56,31 @@ def recreate_node(module: str, qualname: str, version: str, label: str) -> Node:
     return recreate_obj(module, qualname, version, {"label": label})
 
 
-def node_to_dict(node: Node) -> dict:
+def node_to_jsongroup(node: Node) -> JSONGroup:
     module, qualname, version = get_type(node)
     connected_inputs = [input.label for input in node.inputs if input.connected]
-    node_dict = {
-        "inputs": node_inputs_to_dict(node),
-        "node": {
-            "qualname": qualname,
-            "module": module,
-            "version": version,
-            "connected_inputs": connected_inputs,
-        },
-    }
-    return node_dict
-
-
-def get_hash(obj_to_be_hashed: Node | dict) -> str:
-    node_dict = (
-        obj_to_be_hashed
-        if isinstance(obj_to_be_hashed, dict)
-        else node_to_dict(obj_to_be_hashed)
+    json_group = JSONGroup({})
+    json_group.update(
+        {
+            "inputs": node_inputs_to_jsongroup(node).data,
+            "node": {
+                "qualname": qualname,
+                "module": module,
+                "version": version,
+                "connected_inputs": connected_inputs,
+            },
+        }
     )
-    jsonified_dict = json.dumps(node_dict, sort_keys=True)
+    return json_group
+
+
+def get_hash(obj_to_be_hashed: Node | JSONGroup) -> str:
+    node_jsongroup = (
+        obj_to_be_hashed
+        if isinstance(obj_to_be_hashed, JSONGroup)
+        else node_to_jsongroup(obj_to_be_hashed)
+    )
+    jsonified_dict = json.dumps(node_jsongroup.data, sort_keys=True)
 
     hasher = hashlib.sha256()
     hasher.update(jsonified_dict.encode("utf-8"))
@@ -86,26 +89,29 @@ def get_hash(obj_to_be_hashed: Node | dict) -> str:
     return hash_value
 
 
-def node_inputs_to_dict(node: Node) -> dict[str, Any]:
+def node_inputs_to_jsongroup(node: Node) -> JSONGroup:
     def resolve_connections(value: Any):
         if value.connected:
             return (
                 get_hash(value.connections[0].owner) + "@" + value.connections[0].label
             )
         else:
-            return str(value)
+            return value.value
 
     output = {
         k: resolve_connections(v)
         for k, v in node.inputs.items()
-        if v.value != v.default
     }
 
-    return output
+    json_group = JSONGroup({})
+    json_group.update(output)
+
+    return json_group
 
 
-def node_outputs_to_dict(node: Node) -> dict[str, Any]:
-    output = {k: v.value for k, v in node.outputs.items()}
+def node_outputs_to_dict(node: Node) -> JSONGroup:
+    output = JSONGroup({})
+    output.update({k: v.value for k, v in node.outputs.items()})
     return output
 
 
@@ -132,8 +138,9 @@ def store_node_in_database(
     Returns:
         str: The hash of the stored node.
     """
-    node_dict = node_to_dict(node)
-    node_hash = get_hash(node_dict)
+    node_jsongroup = node_to_jsongroup(node)
+    node_hash = get_hash(node_jsongroup)
+    node_dict = node_jsongroup.data
     output_path = None
     if store_outputs:
         output_path = store_node_outputs(node)
@@ -194,8 +201,9 @@ def restore_node_from_database(
     )
     parent.add_child(node)
 
+    restored_inputs = JSONGroup(db_result.inputs)
     # restore inputs
-    for k, v in db_result.inputs.items():
+    for k, v in restored_inputs.items():
         if k in db_result.connected_inputs:
             input_hash, input_label = v.split("@")
             input_node = restore_node_from_database(db, input_hash, parent)

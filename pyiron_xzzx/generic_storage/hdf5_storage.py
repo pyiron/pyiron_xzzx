@@ -54,12 +54,12 @@ class HDF5Group(StorageGroup):
 
         # scalar
         if value.ndim == 0:
-            if h5py.check_string_dtype(self.data[key].dtype):
-                return self.data[key].asstr()[()]
-            return self.data[key][()]
+            if h5py.check_string_dtype(value.dtype):
+                return value.asstr()[()]
+            return value[()]
 
         # array
-        return self.data[key][:]
+        return value[:]
 
     def __setitem__(self, key: str, value: Any):
         if is_dataclass(value):
