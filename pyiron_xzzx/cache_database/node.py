@@ -145,7 +145,7 @@ def store_node_in_database(
     if store_outputs:
         output_path = store_node_outputs(node)
 
-    db.create(
+    node_data = CacheDatabase.NodeData(
         hash=node_hash,
         label=node.label,
         qualname=node_dict["node"]["qualname"],
@@ -155,6 +155,7 @@ def store_node_in_database(
         inputs=node_dict["inputs"],
         output_path=output_path,
     )
+    db.create(node_data)
     if store_input_nodes_recursively:
         connected_nodes = [
             input.connections[0].owner for input in node.inputs if input.connected

@@ -2,12 +2,9 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 import enum
-from typing import Optional
 
-from sqlalchemy import Column, Enum, Integer, MetaData, String, Table, create_engine
+from sqlalchemy import Column, MetaData, String, Table, create_engine
 from sqlalchemy.dialects.postgresql import JSONB
-
-from pyiron_xzzx.generic_storage import JSONString
 
 
 class OutputState(enum.Enum):
@@ -53,28 +50,21 @@ class CacheDatabase:
 
     def create(
         self,
-        hash: str,
-        label: str | None,
-        qualname,
-        module,
-        version,
-        connected_inputs,
-        inputs,
-        output_path,
+        node: NodeData,
     ) -> str:
-        if self.read(hash) is not None:
-            raise ValueError("A node with this hash already exists in the database!")
+        if self.read(node.hash) is not None:
+            return node.hash
 
         with self.engine.connect() as connection:
             stmt = self.table.insert().values(
-                hash=hash,
-                label=label,
-                qualname=qualname,
-                module=module,
-                version=version,
-                connected_inputs=connected_inputs,
-                inputs=inputs,
-                output_path=output_path,
+                hash=node.hash,
+                label=node.label,
+                qualname=node.qualname,
+                module=node.module,
+                version=node.version,
+                connected_inputs=node.connected_inputs,
+                inputs=node.inputs,
+                output_path=node.output_path,
             )
             result = connection.execute(stmt)
             connection.commit()
@@ -84,9 +74,9 @@ class CacheDatabase:
         with self.engine.connect() as connection:
             stmt = self.table.select().where(self.table.c.hash == hash)
             result = connection.execute(stmt).first()
-            return result
+            return None if result is None else self.NodeData(**result._mapping)
 
-    def update(self, hash, **kwargs):
+    def update(self, hash: str, **kwargs):
         with self.engine.connect() as connection:
             stmt = self.table.update().where(self.table.c.hash == hash).values(**kwargs)
             connection.execute(stmt)
