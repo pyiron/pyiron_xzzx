@@ -23,22 +23,27 @@ class TestDataIO(unittest.TestCase):
         group["int"] = 1
         group["float"] = 1.2
         group["string"] = "1"
-        # group["None"] = None
-        # group["NOT_DATA"] = NOT_DATA
+        group["None"] = None
+        group["NOT_DATA"] = NOT_DATA
         rect = Rectangle(Point(1, 2), Point(3, 4))
         group["rect"] = rect
+        group["list"] = [1, 2, 3]
+        import numpy as np
+        group["np"] = np.array([1, 2, 3])
 
     def check(self, group):
         self.assertEqual(group["int"], 1)
         self.assertAlmostEqual(group["float"], 1.2)
         self.assertEqual(group["string"], "1")
-        # self.assertEqual(group["None"], None)
-        # self.assertEqual(group["NOT_DATA"], NOT_DATA)
+        self.assertEqual(group["None"], None)
+        self.assertEqual(group["NOT_DATA"], NOT_DATA)
         rect = group["rect"]
         self.assertEqual(rect.upper_left_corner.x, 1)
         self.assertEqual(rect.upper_left_corner.y, 2)
         self.assertEqual(rect.lower_right_corner.x, 3)
         self.assertEqual(rect.lower_right_corner.y, 4)
+        self.assertListEqual(group["list"], [1, 2, 3])
+        self.assertListEqual(group["np"].tolist(), [1, 2, 3])
 
     def test_json_io(self):
         with JSONStorage("dummy.json", "w") as group:

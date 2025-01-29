@@ -37,18 +37,23 @@ class HDF5Group(StorageGroup):
         del self.data[key]
 
     def __getitem__(self, key: str) -> Any:
-        if self.data.get(key, getclass=True) is h5py.Group:
+        if self.is_group(key):
             group = HDF5Group(self.data[key])
             type = group.get("_type", "group")
-            if type != "group":
-                module, qualname, version = type.split("@")
-                return recreate_obj(
-                    module,
-                    qualname,
-                    version,
-                    init_args={k: v for k, v in group.items() if k != "_type"},
-                )
-            return HDF5Group(self.data[key])
+            match type:
+                case "group":
+                    return group
+                case "None":
+                    return None
+                case "list":
+                    lst = []
+                    i = 0
+                    while f'item_{i}' in group:
+                        lst.append(group[f'item_{i}'])
+                        i += 1
+                    return lst
+                case _:
+                    return self._recover_value(group)
 
         value = self.data[key]
 
@@ -62,19 +67,22 @@ class HDF5Group(StorageGroup):
         return value[:]
 
     def __setitem__(self, key: str, value: Any):
-        if is_dataclass(value):
-            group = HDF5Group(self.create_group(key))
-            module, qualname, version = get_type(value)
-            group["_type"] = "@".join([module, qualname, version])
-            unwrap_dataclass(group, value)
-            return
+        if value is None:
+            group = self.create_group(key)
+            group["_type"] = "None"
+            return  
 
-        try:
+        if isinstance(value, list):
+            group = self.create_group(key)
+            group["_type"] = "list"
+            for i, v in enumerate(value):
+                group[f'item_{i}'] = v
+            return
+        
+        self._transform_value(key, value)
+
+        if key not in self:
             self.data[key] = value
-        except TypeError as type_error:
-            raise TypeError(
-                f"'{key}' of type {type(value)} cannot be written to HDF5."
-            ) from type_error
 
     def __iter__(self) -> Iterator[str]:
         return iter(self.data)
@@ -83,7 +91,10 @@ class HDF5Group(StorageGroup):
         return len(self.data)
 
     def create_group(self, key: str) -> HDF5Group:
-        return self.data.create_group(key)
+        return HDF5Group(self.data.create_group(key))
 
     def require_group(self, key: str) -> HDF5Group:
-        return self.data.require_group(key)
+        return HDF5Group(self.data.require_group(key))
+
+    def is_group(self, key: str) -> bool:
+        return self.data.get(key, getclass=True) is h5py.Group
