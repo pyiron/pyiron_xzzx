@@ -14,8 +14,7 @@ def get_type(cls):
     )
     return module, qualname, version
 
-
-def recreate_obj(module: str, qualname: str, version: str, init_args: dict) -> Any:
+def recreate_type(module: str, qualname: str, version: str) -> Any:
     from importlib import import_module
 
     base_module = import_module(module.split(".")[0])
@@ -24,8 +23,13 @@ def recreate_obj(module: str, qualname: str, version: str, init_args: dict) -> A
         if hasattr(base_module, "__version__")
         else "not_defined"
     )
-    if actual_version != version:
-        raise ValueError(f"Version mismatch: {version} != {actual_version}")
+    # if actual_version != version:
+    #     raise ValueError(f"Version mismatch: {version} != {actual_version}")
     module = import_module(module)
-    obj = getattr(module, qualname)(**init_args)
+    recreated_type = getattr(module, qualname)
+    return recreated_type
+
+def recreate_obj(module: str, qualname: str, version: str, init_args: dict) -> Any:
+    recreated_type = recreate_type(module, qualname, version)
+    obj = recreated_type(**init_args)
     return obj
