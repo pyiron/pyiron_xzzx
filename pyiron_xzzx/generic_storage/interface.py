@@ -39,7 +39,7 @@ class StorageGroup(MutableMapping[str, Any], abc.ABC):
                 args = group["args"]
                 obj = func(*args)
                 state = group["state"]
-                if hasattr(obj, '__setstate__'):
+                if hasattr(obj, "__setstate__"):
                     obj.__setstate__(state)
                 else:
                     obj.__dict__.update(**state)
@@ -47,8 +47,8 @@ class StorageGroup(MutableMapping[str, Any], abc.ABC):
             case "tuple":
                 lst = []
                 i = 0
-                while f'item_{i}' in group:
-                    lst.append(group[f'item_{i}'])
+                while f"item_{i}" in group:
+                    lst.append(group[f"item_{i}"])
                     i += 1
                 return tuple(lst)
             # case "dict":
@@ -59,35 +59,40 @@ class StorageGroup(MutableMapping[str, Any], abc.ABC):
                     module,
                     qualname,
                     version,
-                )   
+                )
             case "base64":
                 from base64 import b64decode
-                return b64decode(group["value"].encode('utf8'))                    
+
+                return b64decode(group["value"].encode("utf8"))
             case _:
                 raise TypeError(f"Could not instantiate: {type}")
 
     def _transform_value(self, key: str, value: Any):
         if isinstance(value, type) or callable(value):
-            module, qualname, version = value.__module__, value.__qualname__, "not_defined"
+            module, qualname, version = (
+                value.__module__,
+                value.__qualname__,
+                "not_defined",
+            )
             group = self.create_group(key)
             group["_type"] = "type"
             group["_class"] = "@".join([module, qualname, version])
             return
-        
+
         if isinstance(value, tuple):
             group = self.create_group(key)
             group["_type"] = "tuple"
             for i, v in enumerate(value):
-                group[f'item_{i}'] = v
+                group[f"item_{i}"] = v
             return
-        
+
         if isinstance(value, dict):
             group = self.create_group(key)
             for k, v in value.items():
                 group[k] = v
             return
-        
-        if hasattr(value, '__reduce__'):
+
+        if hasattr(value, "__reduce__"):
             try:
                 rv = value.__reduce__()
             except TypeError:
@@ -99,7 +104,7 @@ class StorageGroup(MutableMapping[str, Any], abc.ABC):
                     group["_type"] = "global"
                     group["_class"] = "@".join([module, qualname, version])
                     return
-                
+
                 func, args, state, *reminder = value.__reduce__()
                 group = self.create_group(key)
                 group["_type"] = "pickle"
@@ -107,12 +112,13 @@ class StorageGroup(MutableMapping[str, Any], abc.ABC):
                 group["args"] = args
                 group["state"] = state
                 return
-            
+
         if isinstance(value, bytes):
             from base64 import b64encode
+
             group = self.create_group(key)
             group["_type"] = "base64"
-            group["value"] = b64encode(value).decode('utf8')
+            group["value"] = b64encode(value).decode("utf8")
             return
 
 

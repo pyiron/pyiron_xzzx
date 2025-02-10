@@ -69,6 +69,7 @@ class Neo4jInstanceDatabase(InstanceDatabase):
                 out=out,
                 channels=channels,
             )
+        return node.hash
 
     def read(self, hash: str) -> InstanceDatabase.NodeData | None:
         with GraphDatabase.driver(self.uri, auth=self.auth) as driver:

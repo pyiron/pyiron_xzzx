@@ -72,6 +72,6 @@ class JSONGroup(StorageGroup):
 
     def require_group(self, key: str) -> JSONGroup:
         return JSONGroup(self.data[key])
-    
+
     def is_group(self, key: str) -> bool:
         return isinstance(self.data.get(key, None), dict)

@@ -99,10 +99,7 @@ def node_inputs_to_jsongroup(node: Node) -> JSONGroup:
         else:
             return value.value
 
-    output = {
-        k: resolve_connections(v)
-        for k, v in node.inputs.items()
-    }
+    output = {k: resolve_connections(v) for k, v in node.inputs.items()}
 
     json_group = JSONGroup({})
     json_group.update(output)

@@ -29,6 +29,7 @@ class TestDataIO(unittest.TestCase):
         group["rect"] = rect
         group["list"] = [1, 2, 3]
         import numpy as np
+
         group["np"] = np.array([1, 2, 3])
 
     def check(self, group):

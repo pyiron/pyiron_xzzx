@@ -48,8 +48,8 @@ class HDF5Group(StorageGroup):
                 case "list":
                     lst = []
                     i = 0
-                    while f'item_{i}' in group:
-                        lst.append(group[f'item_{i}'])
+                    while f"item_{i}" in group:
+                        lst.append(group[f"item_{i}"])
                         i += 1
                     return lst
                 case _:
@@ -70,15 +70,15 @@ class HDF5Group(StorageGroup):
         if value is None:
             group = self.create_group(key)
             group["_type"] = "None"
-            return  
+            return
 
         if isinstance(value, list):
             group = self.create_group(key)
             group["_type"] = "list"
             for i, v in enumerate(value):
-                group[f'item_{i}'] = v
+                group[f"item_{i}"] = v
             return
-        
+
         self._transform_value(key, value)
 
         if key not in self:

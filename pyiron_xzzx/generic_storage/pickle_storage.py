@@ -56,6 +56,6 @@ class PickleGroup(StorageGroup):
 
     def require_group(self, key: str) -> PickleGroup:
         return PickleGroup(self.data[key])
-    
+
     def is_group(self, key: str) -> bool:
         return isinstance(self.get(key, None), dict)

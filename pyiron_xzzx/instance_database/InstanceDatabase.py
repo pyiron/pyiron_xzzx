@@ -12,7 +12,7 @@ class InstanceDatabase(abc.ABC):
         qualname: str
         module: str
         version: str
-        connected_inputs: dict
+        connected_inputs: list[str]
         inputs: dict
         outputs: list[str]
         output_path: str
