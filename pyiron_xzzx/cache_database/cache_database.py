@@ -1,30 +1,12 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
-import enum
-
 from sqlalchemy import Column, MetaData, String, Table, create_engine
-from sqlalchemy.dialects.postgresql import JSONB
+from sqlalchemy.dialects.postgresql import JSONB, insert
+
+from .interface import NodeDatabase
 
 
-class OutputState(enum.Enum):
-    NOT_AVAILABLE = "NOT_AVAILABLE"
-    IN_DATABASE = "IN_DATABASE"
-    EXTERNAL = "EXTERNAL"
-
-
-class CacheDatabase:
-    @dataclass
-    class NodeData:
-        hash: str
-        label: str
-        qualname: str
-        module: str
-        version: str
-        connected_inputs: dict
-        inputs: dict
-        output_path: str
-        
+class PostgreSQLNodeDatabase(NodeDatabase):
     def __init__(self, connection_string: str, echo: bool = False):
         self.metadata = MetaData()
         self.table = Table(
@@ -37,6 +19,7 @@ class CacheDatabase:
             Column("version", String, nullable=True),
             Column("connected_inputs", JSONB, nullable=True),
             Column("inputs", JSONB, nullable=True),
+            Column("outputs", JSONB, nullable=True),
             Column("output_path", String, nullable=True),
         )
 
@@ -50,13 +33,13 @@ class CacheDatabase:
 
     def create(
         self,
-        node: NodeData,
+        node: NodeDatabase.NodeData,
     ) -> str:
-        if self.read(node.hash) is not None:
-            return node.hash
+        # if self.read(node.hash) is not None:
+        #     return node.hash
 
         with self.engine.connect() as connection:
-            stmt = self.table.insert().values(
+            stmt = insert(self.table).values(
                 hash=node.hash,
                 label=node.label,
                 qualname=node.qualname,
@@ -64,13 +47,14 @@ class CacheDatabase:
                 version=node.version,
                 connected_inputs=node.connected_inputs,
                 inputs=node.inputs,
+                outputs=node.outputs,
                 output_path=node.output_path,
-            )
+            ).on_conflict_do_nothing()
             result = connection.execute(stmt)
             connection.commit()
             return result.inserted_primary_key[0]
 
-    def read(self, hash: str) -> NodeData | None:
+    def read(self, hash: str) -> NodeDatabase.NodeData | None:
         with self.engine.connect() as connection:
             stmt = self.table.select().where(self.table.c.hash == hash)
             result = connection.execute(stmt).first()

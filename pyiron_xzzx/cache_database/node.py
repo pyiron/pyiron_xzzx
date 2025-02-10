@@ -6,7 +6,7 @@ from pyiron_workflow import NOT_DATA
 from pyiron_workflow.node import Node
 from pyiron_workflow.workflow import Workflow
 
-from pyiron_xzzx.cache_database.cache_database import CacheDatabase
+from .interface import NodeDatabase
 from pyiron_xzzx.generic_storage import HDF5Storage, JSONGroup
 from pyiron_xzzx.obj_reconstruction.util import get_type, recreate_obj
 
@@ -63,6 +63,7 @@ def node_to_jsongroup(node: Node) -> JSONGroup:
     json_group.update(
         {
             "inputs": node_inputs_to_jsongroup(node).data,
+            "outputs": [o for o, _ in node.outputs.items()],
             "node": {
                 "qualname": qualname,
                 "module": module,
@@ -116,7 +117,7 @@ def node_outputs_to_dict(node: Node) -> JSONGroup:
 
 
 def store_node_in_database(
-    db: CacheDatabase,
+    db: NodeDatabase,
     node: Node,
     store_outputs: bool = False,
     store_input_nodes_recursively: bool = False,
@@ -129,7 +130,7 @@ def store_node_in_database(
     outputs.
 
     Args:
-        db (CacheDatabase): The database to store the node in.
+        db (NodeDatabase): The database to store the node in.
         node (Node): The node to store.
         store_outputs (bool): Whether to store the outputs of the node as well.
         store_input_nodes_recursively (bool): Whether to store all the nodes that are
@@ -145,7 +146,7 @@ def store_node_in_database(
     if store_outputs:
         output_path = store_node_outputs(node)
 
-    node_data = CacheDatabase.NodeData(
+    node_data = NodeDatabase.NodeData(
         hash=node_hash,
         label=node.label,
         qualname=node_dict["node"]["qualname"],
@@ -153,6 +154,7 @@ def store_node_in_database(
         version=node_dict["node"]["version"],
         connected_inputs=node_dict["node"]["connected_inputs"],
         inputs=node_dict["inputs"],
+        outputs=node_dict["outputs"],
         output_path=output_path,
     )
     db.create(node_data)
@@ -171,7 +173,7 @@ def store_node_in_database(
 
 
 def restore_node_from_database(
-    db: CacheDatabase, node_hash: str, parent: Workflow
+    db: NodeDatabase, node_hash: str, parent: Workflow
 ) -> Node:
     """
     Restore a node from the database.
@@ -182,7 +184,7 @@ def restore_node_from_database(
     values directly.
 
     Args:
-        db: The CacheDatabase instance to read from.
+        db: The NodeDatabase instance to read from.
         node_hash: The hash of the node to restore.
         parent: The workflow to add the restored node to.
 
