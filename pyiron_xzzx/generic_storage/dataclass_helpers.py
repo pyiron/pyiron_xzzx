@@ -6,6 +6,7 @@ if TYPE_CHECKING:
     from _typeshed import DataclassInstance
 
 from dataclasses import fields
+
 from pyiron_xzzx.generic_storage.interface import StorageGroup
 
 

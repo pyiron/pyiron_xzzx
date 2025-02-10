@@ -1,8 +1,8 @@
 from __future__ import annotations
 
-from .InstanceDatabase import InstanceDatabase
-
 from neo4j import GraphDatabase
+
+from .InstanceDatabase import InstanceDatabase
 
 
 class Neo4jInstanceDatabase(InstanceDatabase):

@@ -6,9 +6,10 @@ from pyiron_workflow import NOT_DATA
 from pyiron_workflow.node import Node
 from pyiron_workflow.workflow import Workflow
 
-from .InstanceDatabase import InstanceDatabase
 from pyiron_xzzx.generic_storage import HDF5Storage, JSONGroup
 from pyiron_xzzx.obj_reconstruction.util import get_type, recreate_obj
+
+from .InstanceDatabase import InstanceDatabase
 
 
 def store_node_outputs(node: Node) -> str:
