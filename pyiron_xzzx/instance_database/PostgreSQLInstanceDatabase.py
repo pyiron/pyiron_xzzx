@@ -35,9 +35,6 @@ class PostgreSQLInstanceDatabase(InstanceDatabase):
         self,
         node: InstanceDatabase.NodeData,
     ) -> str:
-        # if self.read(node.hash) is not None:
-        #     return node.hash
-
         with self.engine.connect() as connection:
             stmt = (
                 insert(self.table)
