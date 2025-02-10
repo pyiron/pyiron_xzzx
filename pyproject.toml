@@ -52,6 +52,9 @@ include = [ "pyiron_xzzx*",]
 [tool.setuptools.dynamic.version]
 attr = "pyiron_xzzx.__version__"
 
+[tool.ruff]
+exclude = ["docs/conf.py", "setup.py", "_version.py"]
+
 [tool.ruff.lint]
 select = [
     # pycodestyle
