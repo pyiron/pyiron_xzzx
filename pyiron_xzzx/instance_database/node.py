@@ -6,7 +6,7 @@ from pyiron_workflow import NOT_DATA
 from pyiron_workflow.node import Node
 from pyiron_workflow.workflow import Workflow
 
-from .interface import NodeDatabase
+from .InstanceDatabase import InstanceDatabase
 from pyiron_xzzx.generic_storage import HDF5Storage, JSONGroup
 from pyiron_xzzx.obj_reconstruction.util import get_type, recreate_obj
 
@@ -117,7 +117,7 @@ def node_outputs_to_dict(node: Node) -> JSONGroup:
 
 
 def store_node_in_database(
-    db: NodeDatabase,
+    db: InstanceDatabase,
     node: Node,
     store_outputs: bool = False,
     store_input_nodes_recursively: bool = False,
@@ -130,7 +130,7 @@ def store_node_in_database(
     outputs.
 
     Args:
-        db (NodeDatabase): The database to store the node in.
+        db (InstanceDatabase): The database to store the node in.
         node (Node): The node to store.
         store_outputs (bool): Whether to store the outputs of the node as well.
         store_input_nodes_recursively (bool): Whether to store all the nodes that are
@@ -146,7 +146,7 @@ def store_node_in_database(
     if store_outputs:
         output_path = store_node_outputs(node)
 
-    node_data = NodeDatabase.NodeData(
+    node_data = InstanceDatabase.NodeData(
         hash=node_hash,
         label=node.label,
         qualname=node_dict["node"]["qualname"],
@@ -173,7 +173,7 @@ def store_node_in_database(
 
 
 def restore_node_from_database(
-    db: NodeDatabase, node_hash: str, parent: Workflow
+    db: InstanceDatabase, node_hash: str, parent: Workflow
 ) -> Node:
     """
     Restore a node from the database.
@@ -184,7 +184,7 @@ def restore_node_from_database(
     values directly.
 
     Args:
-        db: The NodeDatabase instance to read from.
+        db: The InstanceDatabase instance to read from.
         node_hash: The hash of the node to restore.
         parent: The workflow to add the restored node to.
 

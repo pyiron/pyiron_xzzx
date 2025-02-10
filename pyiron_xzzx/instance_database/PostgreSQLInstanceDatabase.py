@@ -3,10 +3,10 @@ from __future__ import annotations
 from sqlalchemy import Column, MetaData, String, Table, create_engine
 from sqlalchemy.dialects.postgresql import JSONB, insert
 
-from .interface import NodeDatabase
+from .InstanceDatabase import InstanceDatabase
 
 
-class PostgreSQLNodeDatabase(NodeDatabase):
+class PostgreSQLInstanceDatabase(InstanceDatabase):
     def __init__(self, connection_string: str, echo: bool = False):
         self.metadata = MetaData()
         self.table = Table(
@@ -33,28 +33,32 @@ class PostgreSQLNodeDatabase(NodeDatabase):
 
     def create(
         self,
-        node: NodeDatabase.NodeData,
+        node: InstanceDatabase.NodeData,
     ) -> str:
         # if self.read(node.hash) is not None:
         #     return node.hash
 
         with self.engine.connect() as connection:
-            stmt = insert(self.table).values(
-                hash=node.hash,
-                label=node.label,
-                qualname=node.qualname,
-                module=node.module,
-                version=node.version,
-                connected_inputs=node.connected_inputs,
-                inputs=node.inputs,
-                outputs=node.outputs,
-                output_path=node.output_path,
-            ).on_conflict_do_nothing()
+            stmt = (
+                insert(self.table)
+                .values(
+                    hash=node.hash,
+                    label=node.label,
+                    qualname=node.qualname,
+                    module=node.module,
+                    version=node.version,
+                    connected_inputs=node.connected_inputs,
+                    inputs=node.inputs,
+                    outputs=node.outputs,
+                    output_path=node.output_path,
+                )
+                .on_conflict_do_nothing()
+            )
             result = connection.execute(stmt)
             connection.commit()
             return result.inserted_primary_key[0]
 
-    def read(self, hash: str) -> NodeDatabase.NodeData | None:
+    def read(self, hash: str) -> InstanceDatabase.NodeData | None:
         with self.engine.connect() as connection:
             stmt = self.table.select().where(self.table.c.hash == hash)
             result = connection.execute(stmt).first()

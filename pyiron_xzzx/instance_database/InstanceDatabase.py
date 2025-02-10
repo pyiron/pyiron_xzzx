@@ -4,7 +4,7 @@ import abc
 from dataclasses import dataclass
 
 
-class NodeDatabase(abc.ABC):
+class InstanceDatabase(abc.ABC):
     @dataclass
     class NodeData:
         hash: str

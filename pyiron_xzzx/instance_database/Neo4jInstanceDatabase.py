@@ -1,11 +1,11 @@
 from __future__ import annotations
 
-from .interface import NodeDatabase
+from .InstanceDatabase import InstanceDatabase
 
 from neo4j import GraphDatabase
 
 
-class Neo4jNodeDatabase(NodeDatabase):
+class Neo4jInstanceDatabase(InstanceDatabase):
     def __init__(self, uri, auth):
         self.uri = uri
         self.auth = auth
@@ -17,8 +17,9 @@ class Neo4jNodeDatabase(NodeDatabase):
     def create_table(self):
         with GraphDatabase.driver(self.uri, auth=self.auth) as driver:
             with driver.session() as session:
-                session.run("CREATE INDEX node_hash_index FOR (n:NODE) ON (n.hash)")
-        
+                session.run(
+                    "CREATE INDEX node_hash_index IF NOT EXISTS FOR (n:NODE) ON (n.hash)"
+                )
 
     def drop_table(self):
         with GraphDatabase.driver(self.uri, auth=self.auth) as driver:
@@ -27,7 +28,7 @@ class Neo4jNodeDatabase(NodeDatabase):
 
     def create(
         self,
-        node: NodeDatabase.NodeData,
+        node: InstanceDatabase.NodeData,
     ) -> str:
         with self.driver.session(database="neo4j") as tx:
             inp = [{"key": k, "value": v} for k, v in node.inputs.items()]
@@ -69,7 +70,7 @@ class Neo4jNodeDatabase(NodeDatabase):
                 channels=channels,
             )
 
-    def read(self, hash: str) -> NodeDatabase.NodeData | None:
+    def read(self, hash: str) -> InstanceDatabase.NodeData | None:
         with GraphDatabase.driver(self.uri, auth=self.auth) as driver:
             records, summary, keys = driver.execute_query(
                 """
