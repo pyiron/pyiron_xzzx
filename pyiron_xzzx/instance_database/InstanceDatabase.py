@@ -12,16 +12,16 @@ class InstanceDatabase(abc.ABC):
         module: str
         version: str
         connected_inputs: list[str]
-        inputs: dict
+        inputs: dict[str, str]
         outputs: list[str]
         output_path: str | None
 
     @abc.abstractmethod
-    def create_table(self):
+    def create_table(self) -> None:
         pass
 
     @abc.abstractmethod
-    def drop_table(self):
+    def drop_table(self) -> None:
         pass
 
     @abc.abstractmethod
@@ -37,5 +37,5 @@ class InstanceDatabase(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def delete(self, hash: str):
+    def delete(self, hash: str) -> None:
         pass

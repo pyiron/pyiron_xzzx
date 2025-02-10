@@ -1,7 +1,7 @@
 from typing import Any
 
 
-def get_type(cls):
+def get_type(cls: Any) -> tuple[str, str, str]:
     module = cls.__class__.__module__
     qualname = cls.__class__.__qualname__
     from importlib import import_module
@@ -31,7 +31,7 @@ def recreate_type(module_name: str, qualname: str, version: str) -> Any:
     return recreated_type
 
 
-def recreate_obj(module: str, qualname: str, version: str, init_args: dict) -> Any:
+def recreate_obj(module: str, qualname: str, version: str, init_args: dict[str, Any]) -> Any:
     recreated_type = recreate_type(module, qualname, version)
     obj = recreated_type(**init_args)
     return obj

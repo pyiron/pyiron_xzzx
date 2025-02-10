@@ -67,7 +67,7 @@ class StorageGroup(MutableMapping[str, Any], abc.ABC):
             case _:
                 raise TypeError(f"Could not instantiate: {type}")
 
-    def _transform_value(self, key: str, value: Any):
+    def _transform_value(self, key: str, value: Any) -> None:
         if isinstance(value, type) or callable(value):
             module, qualname, version = (
                 value.__module__,

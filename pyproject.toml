@@ -96,3 +96,8 @@ extend-exclude = '''
   ^/docs
 )
 '''
+
+[tool.mypy]
+ignore_missing_imports = true
+strict = true
+exclude = ['docs/conf.py', 'pyiron_xzzx/_version.py']
