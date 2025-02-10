@@ -1,0 +1,111 @@
+from __future__ import annotations
+
+from .interface import NodeDatabase
+
+from neo4j import GraphDatabase
+
+
+class Neo4jNodeDatabase(NodeDatabase):
+    def __init__(self, uri, auth):
+        self.uri = uri
+        self.auth = auth
+        self.driver = GraphDatabase.driver(self.uri, auth=self.auth)
+
+    def close(self):
+        self.driver.close()
+
+    def create_table(self):
+        with GraphDatabase.driver(self.uri, auth=self.auth) as driver:
+            with driver.session() as session:
+                session.run("CREATE INDEX node_hash_index FOR (n:NODE) ON (n.hash)")
+        
+
+    def drop_table(self):
+        with GraphDatabase.driver(self.uri, auth=self.auth) as driver:
+            with driver.session() as session:
+                session.run("MATCH (n) DETACH DELETE n")
+
+    def create(
+        self,
+        node: NodeDatabase.NodeData,
+    ) -> str:
+        with self.driver.session(database="neo4j") as tx:
+            inp = [{"key": k, "value": v} for k, v in node.inputs.items()]
+            out = [{"key": k} for k in node.outputs]
+            channels = [
+                {
+                    "input_channel": input_channel,
+                    "output_hash": node.inputs[input_channel].split("@")[0],
+                    "output_channel": node.inputs[input_channel].split("@")[1],
+                }
+                for input_channel in node.connected_inputs
+            ]
+            tx.run(
+                """
+                MERGE (n :NODE {hash: $hash, name:$name, module:$module, version:$version, output_path:$output_path})
+
+                WITH n, $inp AS inp
+                UNWIND inp AS input
+                MERGE (:INPUT {key:input.key, value:input.value}) -[:INPUT]-> (n)
+
+                WITH n, $out AS out
+                UNWIND out AS output
+                MERGE (:OUTPUT {key:output.key}) <-[:OUTPUT]- (n)
+
+                WITH n AS input_node, $channels AS channels
+                UNWIND channels AS channel
+                MATCH (output_node:NODE {hash: channel.output_hash}) -[:OUTPUT]-> (o:OUTPUT {key:channel.output_channel})
+                MATCH (input_node) <-[:INPUT]- (i:INPUT {key:channel.input_channel})
+                MERGE (o)-[:CONNECTION]->(i)
+                """,
+                hash=node.hash,
+                name=node.qualname,
+                module=node.module,
+                version=node.version,
+                label=node.label,
+                output_path=node.output_path if node.output_path else "",
+                inp=inp,
+                out=out,
+                channels=channels,
+            )
+
+    def read(self, hash: str) -> NodeDatabase.NodeData | None:
+        with GraphDatabase.driver(self.uri, auth=self.auth) as driver:
+            records, summary, keys = driver.execute_query(
+                """
+            MATCH (i) --> (n {hash:$hash}) --> (o)
+            RETURN n, o, i
+            """,
+                hash=hash,
+            )
+
+        node = records[0].data()["n"]
+        inputs = {rec.data()["i"]["key"]: rec.data()["i"]["value"] for rec in records}
+        connected_inputs = [
+            k for k, v in inputs.items() if isinstance(v, str) and "@" in v
+        ]
+        outputs = list({rec.data()["o"]["key"] for rec in records})
+
+        import random
+        import string
+
+        res = self.NodeData(
+            hash=node["hash"],
+            label="".join(
+                random.choice(string.ascii_uppercase + string.digits) for _ in range(10)
+            ),
+            qualname=node["name"],
+            module=node["module"],
+            version=node["version"],
+            connected_inputs=connected_inputs,
+            inputs=inputs,
+            outputs=outputs,
+            output_path=node["output_path"],
+        )
+        return res
+
+    def update(self, hash: str, **kwargs):
+        raise NotImplementedError
+
+    def delete(self, hash: str):
+        raise NotImplementedError
