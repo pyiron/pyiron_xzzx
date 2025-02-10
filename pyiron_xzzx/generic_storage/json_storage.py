@@ -9,22 +9,24 @@ from pyiron_xzzx.generic_storage.interface import GenericStorage, StorageGroup
 class JSONStorage(GenericStorage):
     def __init__(self, filename: str, mode="r"):
         super().__init__()
-        self.file = open(filename, mode)
+        self.filename = filename
+        self.mode = mode
         self.data: dict = {}
 
     def _close(self):
         self.file.close()
 
     def __enter__(self) -> JSONGroup:
-        if self.file.readable():
-            self.data = json.loads(self.file.read())
+        with open(self.filename, self.mode) as file:
+            if file.readable():
+                self.data = json.loads(file.read())
 
         return JSONGroup(self.data)
 
     def __exit__(self, exc_type, exc_value, traceback):
-        if self.file.writable():
-            self.file.write(json.dumps(self.data))
-        self._close()
+        with open(self.filename, self.mode) as file:
+            if file.writable():
+                file.write(json.dumps(self.data))
 
 
 class JSONGroup(StorageGroup):

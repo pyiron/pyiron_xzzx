@@ -11,20 +11,18 @@ class Neo4jInstanceDatabase(InstanceDatabase):
         self.auth = auth
         self.driver = GraphDatabase.driver(self.uri, auth=self.auth)
 
-    def close(self):
+    def close(self) -> None:
         self.driver.close()
 
-    def create_table(self):
-        with GraphDatabase.driver(self.uri, auth=self.auth) as driver:
-            with driver.session() as session:
-                session.run(
-                    "CREATE INDEX node_hash_index IF NOT EXISTS FOR (n:NODE) ON (n.hash)"
-                )
+    def create_table(self) -> None:
+        with self.driver.session() as session:
+            session.run(
+                "CREATE INDEX node_hash_index IF NOT EXISTS FOR (n:NODE) ON (n.hash)"
+            )
 
-    def drop_table(self):
-        with GraphDatabase.driver(self.uri, auth=self.auth) as driver:
-            with driver.session() as session:
-                session.run("MATCH (n) DETACH DELETE n")
+    def drop_table(self) -> None:
+        with self.driver.session() as session:
+            session.run("MATCH (n) DETACH DELETE n")
 
     def create(
         self,

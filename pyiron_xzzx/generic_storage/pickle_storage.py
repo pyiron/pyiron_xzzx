@@ -9,22 +9,21 @@ from pyiron_xzzx.generic_storage.interface import GenericStorage, StorageGroup
 class PickleStorage(GenericStorage):
     def __init__(self, filename: str, mode="rb"):
         super().__init__()
-        self.file = open(filename, mode)
+        self.filename = filename
+        self.mode = mode
         self.data: dict = {}
 
-    def _close(self):
-        self.file.close()
-
     def __enter__(self) -> PickleGroup:
-        if self.file.readable():
-            self.data = pickle.load(self.file)
+        with open(self.filename, self.mode) as file:
+            if file.readable():
+                self.data = pickle.load(file)
 
         return PickleGroup(self.data)
 
     def __exit__(self, exc_type, exc_value, traceback):
-        if self.file.writable():
-            pickle.dump(self.data, self.file, pickle.HIGHEST_PROTOCOL)
-        self._close()
+        with open(self.filename, self.mode) as file:
+            if file.writable():
+                pickle.dump(self.data, file, pickle.HIGHEST_PROTOCOL)
 
 
 class PickleGroup(StorageGroup):

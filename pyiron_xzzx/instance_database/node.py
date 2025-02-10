@@ -159,10 +159,10 @@ def store_node_in_database(
         connected_nodes = [
             input.connections[0].owner for input in node.inputs if input.connected
         ]
-        for node in connected_nodes:
+        for connected_node in connected_nodes:
             store_node_in_database(
                 db,
-                node,
+                connected_node,
                 store_outputs=store_outputs,
                 store_input_nodes_recursively=store_input_nodes_recursively,
             )
