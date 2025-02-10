@@ -10,6 +10,6 @@ from dataclasses import fields
 from pyiron_xzzx.generic_storage.interface import StorageGroup
 
 
-def unwrap_dataclass(storage_group: StorageGroup, dataclass: DataclassInstance):
+def unwrap_dataclass(storage_group: StorageGroup, dataclass: DataclassInstance) -> None:
     for field in fields(dataclass):
         storage_group[field.name] = getattr(dataclass, field.name)

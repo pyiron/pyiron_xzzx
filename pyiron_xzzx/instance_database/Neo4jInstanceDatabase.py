@@ -3,10 +3,11 @@ from __future__ import annotations
 from neo4j import GraphDatabase
 
 from .InstanceDatabase import InstanceDatabase
+from typing import NoReturn
 
 
 class Neo4jInstanceDatabase(InstanceDatabase):
-    def __init__(self, uri, auth):
+    def __init__(self, uri, auth) -> None:
         self.uri = uri
         self.auth = auth
         self.driver = GraphDatabase.driver(self.uri, auth=self.auth)
@@ -97,8 +98,8 @@ class Neo4jInstanceDatabase(InstanceDatabase):
         )
         return res
 
-    def update(self, hash: str, **kwargs):
+    def update(self, hash: str, **kwargs) -> NoReturn:
         raise NotImplementedError
 
-    def delete(self, hash: str):
+    def delete(self, hash: str) -> NoReturn:
         raise NotImplementedError

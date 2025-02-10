@@ -12,7 +12,7 @@ class TestTriggerFromIDE(unittest.TestCase):
     Just so we can instruct it to run unit tests here with a gui run command on the file
     """
 
-    def test_void(self):
+    def test_void(self) -> None:
         pass
 
 

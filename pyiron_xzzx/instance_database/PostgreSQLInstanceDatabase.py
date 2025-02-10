@@ -7,7 +7,7 @@ from .InstanceDatabase import InstanceDatabase
 
 
 class PostgreSQLInstanceDatabase(InstanceDatabase):
-    def __init__(self, connection_string: str, echo: bool = False):
+    def __init__(self, connection_string: str, echo: bool = False) -> None:
         self.metadata = MetaData()
         self.table = Table(
             "nodes",
@@ -24,10 +24,10 @@ class PostgreSQLInstanceDatabase(InstanceDatabase):
 
         self.engine = create_engine(connection_string, echo=echo)
 
-    def create_table(self):
+    def create_table(self) -> None:
         self.metadata.create_all(self.engine)
 
-    def drop_table(self):
+    def drop_table(self) -> None:
         self.metadata.drop_all(self.engine)
 
     def create(
@@ -59,12 +59,12 @@ class PostgreSQLInstanceDatabase(InstanceDatabase):
             result = connection.execute(stmt).first()
             return None if result is None else self.NodeData(**result._mapping)
 
-    def update(self, hash: str, **kwargs):
+    def update(self, hash: str, **kwargs) -> None:
         with self.engine.connect() as connection:
             stmt = self.table.update().where(self.table.c.hash == hash).values(**kwargs)
             connection.execute(stmt)
 
-    def delete(self, hash: str):
+    def delete(self, hash: str) -> None:
         with self.engine.connect() as connection:
             stmt = self.table.delete().where(self.table.c.hash == hash)
             connection.execute(stmt)

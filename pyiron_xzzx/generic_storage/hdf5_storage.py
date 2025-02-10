@@ -9,12 +9,12 @@ from pyiron_xzzx.generic_storage.interface import GenericStorage, StorageGroup
 
 
 class HDF5Storage(GenericStorage):
-    def __init__(self, filename: str, mode="r"):
+    def __init__(self, filename: str, mode="r") -> None:
         super().__init__()
         self.file = h5py.File(filename, mode)
         self.data = self.file
 
-    def _close(self):
+    def _close(self) -> None:
         self.file.close()
 
     def __enter__(self) -> HDF5Group:
@@ -25,13 +25,13 @@ class HDF5Storage(GenericStorage):
 
 
 class HDF5Group(StorageGroup):
-    def __init__(self, data: h5py.File):
+    def __init__(self, data: h5py.File) -> None:
         self.data = data
 
     def __contains__(self, item: object) -> bool:
         return item in self.data
 
-    def __delitem__(self, key: str):
+    def __delitem__(self, key: str) -> None:
         del self.data[key]
 
     def __getitem__(self, key: str) -> Any:
@@ -64,7 +64,7 @@ class HDF5Group(StorageGroup):
         # array
         return value[:]
 
-    def __setitem__(self, key: str, value: Any):
+    def __setitem__(self, key: str, value: Any) -> None:
         if value is None:
             group = self.create_group(key)
             group["_type"] = "None"

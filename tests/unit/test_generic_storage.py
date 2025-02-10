@@ -19,7 +19,7 @@ class Rectangle:
 
 
 class TestDataIO(unittest.TestCase):
-    def store(self, group):
+    def store(self, group) -> None:
         group["int"] = 1
         group["float"] = 1.2
         group["string"] = "1"
@@ -32,7 +32,7 @@ class TestDataIO(unittest.TestCase):
 
         group["np"] = np.array([1, 2, 3])
 
-    def check(self, group):
+    def check(self, group) -> None:
         self.assertEqual(group["int"], 1)
         self.assertAlmostEqual(group["float"], 1.2)
         self.assertEqual(group["string"], "1")
@@ -46,19 +46,19 @@ class TestDataIO(unittest.TestCase):
         self.assertListEqual(group["list"], [1, 2, 3])
         self.assertListEqual(group["np"].tolist(), [1, 2, 3])
 
-    def test_json_io(self):
+    def test_json_io(self) -> None:
         with JSONStorage("dummy.json", "w") as group:
             self.store(group)
         with JSONStorage("dummy.json", "r") as group:
             self.check(group)
 
-    def test_hdf5_io(self):
+    def test_hdf5_io(self) -> None:
         with HDF5Storage("dummy.hdf5", "w") as group:
             self.store(group)
         with HDF5Storage("dummy.hdf5", "r") as group:
             self.check(group)
 
-    def test_pickle_io(self):
+    def test_pickle_io(self) -> None:
         with PickleStorage("dummy.pickle", "wb") as group:
             self.store(group)
         with PickleStorage("dummy.pickle", "rb") as group:

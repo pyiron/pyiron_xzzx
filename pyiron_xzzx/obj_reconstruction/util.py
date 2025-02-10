@@ -15,7 +15,9 @@ def get_type(cls: Any) -> tuple[str, str, str]:
     return module, qualname, version
 
 
-def recreate_type(module_name: str, qualname: str, version: str, strict_version_check: bool) -> Any:
+def recreate_type(
+    module_name: str, qualname: str, version: str, strict_version_check: bool = False
+) -> Any:
     from importlib import import_module
 
     base_module = import_module(module_name.split(".")[0])
@@ -32,7 +34,9 @@ def recreate_type(module_name: str, qualname: str, version: str, strict_version_
     return recreated_type
 
 
-def recreate_obj(module: str, qualname: str, version: str, init_args: dict[str, Any]) -> Any:
+def recreate_obj(
+    module: str, qualname: str, version: str, init_args: dict[str, Any]
+) -> Any:
     recreated_type = recreate_type(module, qualname, version)
     obj = recreated_type(**init_args)
     return obj
