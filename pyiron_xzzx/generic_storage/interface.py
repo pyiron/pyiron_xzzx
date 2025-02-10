@@ -52,8 +52,6 @@ class StorageGroup(MutableMapping[str, Any], abc.ABC):
                     lst.append(group[f"item_{i}"])
                     i += 1
                 return tuple(lst)
-            # case "dict":
-            #     return {k: v for k, v in group.items() if k != "_type"}
             case "global":
                 module, qualname, version = group["_class"].split("@")
                 return recreate_type(

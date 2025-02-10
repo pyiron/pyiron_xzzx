@@ -15,17 +15,18 @@ def get_type(cls: Any) -> tuple[str, str, str]:
     return module, qualname, version
 
 
-def recreate_type(module_name: str, qualname: str, version: str) -> Any:
+def recreate_type(module_name: str, qualname: str, version: str, strict_version_check: bool) -> Any:
     from importlib import import_module
 
     base_module = import_module(module_name.split(".")[0])
-    actual_version = (
-        base_module.__version__
-        if hasattr(base_module, "__version__")
-        else "not_defined"
-    )
-    # if actual_version != version:
-    #     raise ValueError(f"Version mismatch: {version} != {actual_version}")
+    if strict_version_check:
+        actual_version = (
+            base_module.__version__
+            if hasattr(base_module, "__version__")
+            else "not_defined"
+        )
+        if actual_version != version:
+            raise ValueError(f"Version mismatch: {version} != {actual_version}")
     module = import_module(module_name)
     recreated_type = getattr(module, qualname)
     return recreated_type
