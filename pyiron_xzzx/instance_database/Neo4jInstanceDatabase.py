@@ -63,7 +63,6 @@ class Neo4jInstanceDatabase(InstanceDatabase):
                 name=node.qualname,
                 module=node.module,
                 version=node.version,
-                label=node.label,
                 output_path=node.output_path if node.output_path else "",
                 inp=inp,
                 out=out,
@@ -88,14 +87,8 @@ class Neo4jInstanceDatabase(InstanceDatabase):
         ]
         outputs = list({rec.data()["o"]["key"] for rec in records})
 
-        import random
-        import string
-
         res = self.NodeData(
             hash=node["hash"],
-            label="".join(
-                random.choice(string.ascii_uppercase + string.digits) for _ in range(10)
-            ),
             qualname=node["name"],
             module=node["module"],
             version=node["version"],

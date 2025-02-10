@@ -8,14 +8,13 @@ class InstanceDatabase(abc.ABC):
     @dataclass
     class NodeData:
         hash: str
-        label: str
         qualname: str
         module: str
         version: str
         connected_inputs: list[str]
         inputs: dict
         outputs: list[str]
-        output_path: str
+        output_path: str | None
 
     @abc.abstractmethod
     def create_table(self):

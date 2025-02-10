@@ -52,8 +52,8 @@ def restore_node_outputs(node: Node) -> bool:
     return True
 
 
-def recreate_node(module: str, qualname: str, version: str, label: str) -> Node:
-    return recreate_obj(module, qualname, version, {"label": label})
+def recreate_node(module: str, qualname: str, version: str) -> Node:
+    return recreate_obj(module, qualname, version, {})
 
 
 def node_to_jsongroup(node: Node) -> JSONGroup:
@@ -145,7 +145,6 @@ def store_node_in_database(
 
     node_data = InstanceDatabase.NodeData(
         hash=node_hash,
-        label=node.label,
         qualname=node_dict["node"]["qualname"],
         module=node_dict["node"]["module"],
         version=node_dict["node"]["version"],
@@ -197,7 +196,6 @@ def restore_node_from_database(
         module=db_result.module,
         qualname=db_result.qualname,
         version=db_result.version,
-        label=db_result.label,
     )
     parent.add_child(node)
 

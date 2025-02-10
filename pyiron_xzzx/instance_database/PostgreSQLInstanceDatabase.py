@@ -13,7 +13,6 @@ class PostgreSQLInstanceDatabase(InstanceDatabase):
             "nodes",
             self.metadata,
             Column("hash", String, primary_key=True),
-            Column("label", String, nullable=True),
             Column("qualname", String, nullable=True),
             Column("module", String, nullable=True),
             Column("version", String, nullable=True),
@@ -40,7 +39,6 @@ class PostgreSQLInstanceDatabase(InstanceDatabase):
                 insert(self.table)
                 .values(
                     hash=node.hash,
-                    label=node.label,
                     qualname=node.qualname,
                     module=node.module,
                     version=node.version,
