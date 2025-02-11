@@ -7,7 +7,7 @@ from typing import Any
 
 import h5py
 
-from pyiron_xzzx.generic_storage.interface import GenericStorage, StorageGroup
+from pyiron_xzzx.generic_storage.interface import StorageGroup
 
 
 class HDF5Group(StorageGroup):

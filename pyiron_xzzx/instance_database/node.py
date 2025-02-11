@@ -53,8 +53,10 @@ def restore_node_outputs(node: Node) -> bool:
     return True
 
 
-def recreate_node(module: str, qualname: str, version: str) -> Node:
-    return recreate_obj(module, qualname, version, {})
+def recreate_node(
+    module: str, qualname: str, version: str, init_args: dict[str, Any]
+) -> Node:
+    return recreate_obj(module, qualname, version, init_args)
 
 
 def node_to_jsongroup(node: Node) -> JSONGroup:
@@ -193,10 +195,18 @@ def restore_node_from_database(
     if db_result is None:
         raise RuntimeError(f"Node with hash {node_hash} not found in database.")
 
+    def generate_random_string(length=20):
+        import random
+        import string
+
+        letters = string.ascii_letters + string.digits
+        return "".join(random.choice(letters) for i in range(length))
+
     node = recreate_node(
         module=db_result.module,
         qualname=db_result.qualname,
         version=db_result.version,
+        init_args={"label": generate_random_string()},
     )
     parent.add_child(node)
 

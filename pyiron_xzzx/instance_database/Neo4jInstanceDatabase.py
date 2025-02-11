@@ -1,9 +1,10 @@
 from __future__ import annotations
 
+from typing import NoReturn
+
 from neo4j import GraphDatabase
 
 from .InstanceDatabase import InstanceDatabase
-from typing import NoReturn
 
 
 class Neo4jInstanceDatabase(InstanceDatabase):
@@ -16,20 +17,20 @@ class Neo4jInstanceDatabase(InstanceDatabase):
         self.driver.close()
 
     def create_table(self) -> None:
-        with self.driver.session() as session:
+        with self.driver.session(database="neo4j") as session:
             session.run(
                 "CREATE INDEX node_hash_index IF NOT EXISTS FOR (n:NODE) ON (n.hash)"
             )
 
     def drop_table(self) -> None:
-        with self.driver.session() as session:
+        with self.driver.session(database="neo4j") as session:
             session.run("MATCH (n) DETACH DELETE n")
 
     def create(
         self,
         node: InstanceDatabase.NodeData,
     ) -> str:
-        with self.driver.session(database="neo4j") as tx:
+        with self.driver.session(database="neo4j").begin_transaction() as tx:
             inp = [{"key": k, "value": v} for k, v in node.inputs.items()]
             out = [{"key": k} for k in node.outputs]
             channels = [
@@ -67,15 +68,23 @@ class Neo4jInstanceDatabase(InstanceDatabase):
                 out=out,
                 channels=channels,
             )
+            tx.commit()
         return node.hash
 
     def read(self, hash: str) -> InstanceDatabase.NodeData | None:
-        with GraphDatabase.driver(self.uri, auth=self.auth) as driver:
-            records, summary, keys = driver.execute_query(
+        def node_graph(tx, hash):
+            result = tx.run(
                 """
-            MATCH (i) --> (n {hash:$hash}) --> (o)
-            RETURN n, o, i
-            """,
+                MATCH (i) --> (n {hash:$hash}) --> (o)
+                RETURN n, o, i
+                """,
+                hash=hash,
+            )
+            return list(result)
+
+        with self.driver.session(database="neo4j") as session:
+            records = session.execute_read(
+                node_graph,
                 hash=hash,
             )
 
