@@ -1,36 +1,15 @@
 from __future__ import annotations
 
+import contextlib
 import json
+from types import TracebackType
 from typing import Any
 
-from pyiron_xzzx.generic_storage.interface import GenericStorage, StorageGroup
-
-
-class JSONStorage(GenericStorage):
-    def __init__(self, filename: str, mode="r") -> None:
-        super().__init__()
-        self.filename = filename
-        self.mode = mode
-        self.data: dict = {}
-
-    def _close(self) -> None:
-        self.file.close()
-
-    def __enter__(self) -> JSONGroup:
-        with open(self.filename, self.mode) as file:
-            if file.readable():
-                self.data = json.loads(file.read())
-
-        return JSONGroup(self.data)
-
-    def __exit__(self, exc_type, exc_value, traceback):
-        with open(self.filename, self.mode) as file:
-            if file.writable():
-                file.write(json.dumps(self.data))
+from pyiron_xzzx.generic_storage.interface import StorageGroup
 
 
 class JSONGroup(StorageGroup):
-    def __init__(self, data: dict) -> None:
+    def __init__(self, data: dict[str, Any]) -> None:
         self.data = data
 
     def __contains__(self, item: object) -> bool:
@@ -74,3 +53,28 @@ class JSONGroup(StorageGroup):
 
     def is_group(self, key: str) -> bool:
         return isinstance(self.data.get(key, None), dict)
+
+
+class JSONStorage(contextlib.AbstractContextManager[JSONGroup]):
+    def __init__(self, filename: str, mode: str = "r") -> None:
+        super().__init__()
+        self.filename = filename
+        self.mode = mode
+        self.data: dict[str, Any] = {}
+
+    def __enter__(self) -> JSONGroup:
+        with open(self.filename, self.mode) as file:
+            if file.readable():
+                self.data = json.loads(file.read())
+
+        return JSONGroup(self.data)
+
+    def __exit__(
+        self,
+        exc_type: type[BaseException] | None,
+        exc_value: BaseException | None,
+        traceback: TracebackType | None,
+    ) -> None:
+        with open(self.filename, self.mode) as file:
+            if file.writable():
+                file.write(json.dumps(self.data))

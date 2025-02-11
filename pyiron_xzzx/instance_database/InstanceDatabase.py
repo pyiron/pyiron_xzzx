@@ -33,7 +33,7 @@ class InstanceDatabase(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def update(self, hash: str, **kwargs):
+    def update(self, hash: str, **kwargs) -> None:
         pass
 
     @abc.abstractmethod

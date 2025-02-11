@@ -1,27 +1,13 @@
 from __future__ import annotations
 
+import contextlib
 from collections.abc import Iterator
+from types import TracebackType
 from typing import Any
 
 import h5py
 
 from pyiron_xzzx.generic_storage.interface import GenericStorage, StorageGroup
-
-
-class HDF5Storage(GenericStorage):
-    def __init__(self, filename: str, mode="r") -> None:
-        super().__init__()
-        self.file = h5py.File(filename, mode)
-        self.data = self.file
-
-    def _close(self) -> None:
-        self.file.close()
-
-    def __enter__(self) -> HDF5Group:
-        return HDF5Group(self.data)
-
-    def __exit__(self, exc_type, exc_value, traceback):
-        self._close()
 
 
 class HDF5Group(StorageGroup):
@@ -96,3 +82,24 @@ class HDF5Group(StorageGroup):
 
     def is_group(self, key: str) -> bool:
         return self.data.get(key, getclass=True) is h5py.Group
+
+
+class HDF5Storage(contextlib.AbstractContextManager[HDF5Group]):
+    def __init__(self, filename: str, mode="r") -> None:
+        super().__init__()
+        self.file = h5py.File(filename, mode)
+        self.data = self.file
+
+    def _close(self) -> None:
+        self.file.close()
+
+    def __enter__(self) -> HDF5Group:
+        return HDF5Group(self.data)
+
+    def __exit__(
+        self,
+        exc_type: type[BaseException] | None,
+        exc_value: BaseException | None,
+        traceback: TracebackType | None,
+    ):
+        self._close()

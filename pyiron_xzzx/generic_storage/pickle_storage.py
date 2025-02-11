@@ -1,29 +1,11 @@
 from __future__ import annotations
 
+import contextlib
 import pickle
+from types import TracebackType
 from typing import Any
 
-from pyiron_xzzx.generic_storage.interface import GenericStorage, StorageGroup
-
-
-class PickleStorage(GenericStorage):
-    def __init__(self, filename: str, mode="rb") -> None:
-        super().__init__()
-        self.filename = filename
-        self.mode = mode
-        self.data: dict = {}
-
-    def __enter__(self) -> PickleGroup:
-        with open(self.filename, self.mode) as file:
-            if file.readable():
-                self.data = pickle.load(file)
-
-        return PickleGroup(self.data)
-
-    def __exit__(self, exc_type, exc_value, traceback):
-        with open(self.filename, self.mode) as file:
-            if file.writable():
-                pickle.dump(self.data, file, pickle.HIGHEST_PROTOCOL)
+from pyiron_xzzx.generic_storage.interface import StorageGroup
 
 
 class PickleGroup(StorageGroup):
@@ -59,3 +41,28 @@ class PickleGroup(StorageGroup):
 
     def is_group(self, key: str) -> bool:
         return isinstance(self.get(key, None), dict)
+
+
+class PickleStorage(contextlib.AbstractContextManager[PickleGroup]):
+    def __init__(self, filename: str, mode="rb") -> None:
+        super().__init__()
+        self.filename = filename
+        self.mode = mode
+        self.data: dict = {}
+
+    def __enter__(self) -> PickleGroup:
+        with open(self.filename, self.mode) as file:
+            if file.readable():
+                self.data = pickle.load(file)
+
+        return PickleGroup(self.data)
+
+    def __exit__(
+        self,
+        exc_type: type[BaseException] | None,
+        exc_value: BaseException | None,
+        traceback: TracebackType | None,
+    ):
+        with open(self.filename, self.mode) as file:
+            if file.writable():
+                pickle.dump(self.data, file, pickle.HIGHEST_PROTOCOL)

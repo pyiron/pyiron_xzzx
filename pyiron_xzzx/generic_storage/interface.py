@@ -119,15 +119,3 @@ class StorageGroup(MutableMapping[str, Any], abc.ABC):
             group["_type"] = "base64"
             group["value"] = b64encode(value).decode("utf8")
             return
-
-
-class GenericStorage(contextlib.AbstractContextManager, abc.ABC):
-    """Context manager for the storage blob, i.e. file open/close, database connection, etc"""
-
-    @abc.abstractmethod
-    def __enter__(self) -> StorageGroup:
-        pass
-
-    @abc.abstractmethod
-    def __exit__(self, exc_type, exc_value, traceback):
-        pass
