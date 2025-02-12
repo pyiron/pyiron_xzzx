@@ -172,7 +172,7 @@ def store_node_in_database(
 
 
 def restore_node_from_database(
-    db: InstanceDatabase, node_hash: str, parent: Workflow
+    db: InstanceDatabase, node_hash: str, parent: Workflow | None = None
 ) -> Node:
     """
     Restore a node from the database.
@@ -208,7 +208,8 @@ def restore_node_from_database(
         version=db_result.version,
         init_args={"label": generate_random_string()},
     )
-    parent.add_child(node)
+    if parent is not None:
+        parent.add_child(node)
 
     restored_inputs = JSONGroup(db_result.inputs)
     # restore inputs

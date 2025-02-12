@@ -11,15 +11,15 @@ from pyiron_xzzx.instance_database import (
 )
 
 
+@Workflow.wrap.as_function_node()
+def AddNode(x: int = 1, y: int = 2) -> tuple[int, int]:
+    a = x + y
+    b = x - y
+    return a, b
+
+
 class TestPostgreSQL(unittest.TestCase):
-
     def test_node_store_restore(self) -> None:
-        @Workflow.wrap.as_function_node()
-        def AddNode(x: int = 1, y: int = 2) -> tuple[int, int]:
-            a = x + y
-            b = x - y
-            return a, b
-
         node = AddNode(3, 4)
 
         db = PostgreSQLInstanceDatabase(
