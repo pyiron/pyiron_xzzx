@@ -17,7 +17,9 @@ jobs:
         image: postgres
         # Provide the password for postgres
         env:
-          POSTGRES_PASSWORD: postgres
+          POSTGRES_USER: pyiron
+          POSTGRES_PASSWORD: pyiron
+          POSTGRES_DB: pyiron_workflow
         # Set health checks to wait until postgres has started
         options: >-
           --health-cmd pg_isready
@@ -43,4 +45,4 @@ jobs:
 
       - name: Install dependencies
         shell: bash -el {0}
-        run: python -m unittest discover
+        run: python -m unittest discover -v
