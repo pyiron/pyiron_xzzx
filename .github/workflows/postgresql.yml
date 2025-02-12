@@ -34,6 +34,8 @@ jobs:
         with:
           auto-update-conda: true
           python-version: '3.12'
+          environment-file: .ci_support/environment.yml
 
       - name: Install dependencies
+        shell: bash -el {0}
         run: python -m unittest discover
