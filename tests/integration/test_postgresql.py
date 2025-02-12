@@ -28,17 +28,14 @@ class TestPostgreSQL(unittest.TestCase):
         db.drop_table()
         db.create_table()
 
-        print("hash: ", get_hash(node))
-
         hash = store_node_in_database(
             db, node, store_outputs=False, store_input_nodes_recursively=True
         )
-        print("hash: ", hash)
 
-        wf2 = Workflow("wf2")
-        node_restored = restore_node_from_database(db, hash, wf2)
+        node_restored = restore_node_from_database(db, hash)
         node_restored.run()
-        self.assertEqual(node_restored.output, (7, -1))
+        self.assertEqual(node_restored.output.a, 7)
+        self.assertEqual(node_restored.output.a, -1)
 
 
 if __name__ == "__main__":
