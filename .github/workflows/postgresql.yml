@@ -43,6 +43,6 @@ jobs:
         shell: bash -el {0}
         run: pip install neo4j-rust-ext
 
-      - name: Install dependencies
+      - name: Run tests
         shell: bash -el {0}
         run: python -m unittest discover -v
