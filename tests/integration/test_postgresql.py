@@ -32,8 +32,8 @@ class TestPostgreSQL(unittest.TestCase):
 
         node_restored = restore_node_from_database(db, hash)
         node_restored.run()
-        self.assertEqual(node_restored.output.a, 7)
-        self.assertEqual(node_restored.output.a, -1)
+        self.assertEqual(node_restored.outputs.a, 7)
+        self.assertEqual(node_restored.outputs.b, -1)
 
 
 if __name__ == "__main__":
