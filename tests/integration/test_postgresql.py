@@ -1,11 +1,9 @@
-import doctest
 import unittest
 
 from pyiron_workflow import Workflow
 
 from pyiron_xzzx.instance_database import (
     PostgreSQLInstanceDatabase,
-    get_hash,
     restore_node_from_database,
     store_node_in_database,
 )
