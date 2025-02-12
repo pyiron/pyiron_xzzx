@@ -11,3 +11,5 @@ jobs:
   pyiron:
     uses: pyiron/actions/.github/workflows/push-pull.yml@actions-3.3.3
     secrets: inherit
+    with:
+      python-version-alt3: 'exclude'
