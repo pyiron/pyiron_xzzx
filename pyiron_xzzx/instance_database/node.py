@@ -1,6 +1,7 @@
 import hashlib
 import json
-from typing import Any, Iterable
+from collections.abc import Iterable
+from typing import Any
 
 from pyiron_workflow import NOT_DATA
 from pyiron_workflow.node import Node
