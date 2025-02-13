@@ -85,7 +85,7 @@ class HDF5Group(StorageGroup):
 
 
 class HDF5Storage(contextlib.AbstractContextManager[HDF5Group]):
-    def __init__(self, filename: str, mode="r") -> None:
+    def __init__(self, filename: str, mode: str="r") -> None:
         super().__init__()
         self.file = h5py.File(filename, mode)
         self.data = self.file
@@ -101,5 +101,5 @@ class HDF5Storage(contextlib.AbstractContextManager[HDF5Group]):
         exc_type: type[BaseException] | None,
         exc_value: BaseException | None,
         traceback: TracebackType | None,
-    ):
+    ) -> None:
         self._close()

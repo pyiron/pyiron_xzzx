@@ -9,7 +9,7 @@ from pyiron_xzzx.generic_storage.interface import StorageGroup
 
 
 class PickleGroup(StorageGroup):
-    def __init__(self, data: dict) -> None:
+    def __init__(self, data: dict[str, Any]) -> None:
         self.data = data
 
     def __contains__(self, item: object) -> bool:
@@ -62,7 +62,7 @@ class PickleStorage(contextlib.AbstractContextManager[PickleGroup]):
         exc_type: type[BaseException] | None,
         exc_value: BaseException | None,
         traceback: TracebackType | None,
-    ):
+    ) -> None:
         with open(self.filename, self.mode) as file:
             if file.writable():
                 pickle.dump(self.data, file, pickle.HIGHEST_PROTOCOL)

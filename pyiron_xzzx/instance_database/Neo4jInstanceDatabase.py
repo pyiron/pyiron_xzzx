@@ -8,7 +8,7 @@ from .InstanceDatabase import InstanceDatabase
 
 
 class Neo4jInstanceDatabase(InstanceDatabase):
-    def __init__(self, uri, auth) -> None:
+    def __init__(self, uri: str, auth: tuple[str, str]) -> None:
         self.uri = uri
         self.auth = auth
         self.driver = GraphDatabase.driver(self.uri, auth=self.auth)
@@ -72,7 +72,7 @@ class Neo4jInstanceDatabase(InstanceDatabase):
         return node.hash
 
     def read(self, hash: str) -> InstanceDatabase.NodeData | None:
-        def node_graph(tx, hash):
+        def node_graph(tx, hash: str):
             result = tx.run(
                 """
                 MATCH (i) --> (n {hash:$hash}) --> (o)

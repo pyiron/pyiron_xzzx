@@ -103,7 +103,7 @@ def get_hash(obj_to_be_hashed: Node | JSONGroup) -> str:
 
 
 def node_inputs_to_jsongroup(node: Node) -> JSONGroup:
-    def resolve_connections(value: Any):
+    def resolve_connections(value: Any) -> Any:
         if value.connected:
             return (
                 get_hash(value.connections[0].owner) + "@" + value.connections[0].label
@@ -205,7 +205,7 @@ def restore_node_from_database(
     if db_result is None:
         raise RuntimeError(f"Node with hash {node_hash} not found in database.")
 
-    def generate_random_string(length=20):
+    def generate_random_string(length: int=20) -> str:
         import random
         import string
 
