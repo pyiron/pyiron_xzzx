@@ -1,6 +1,6 @@
 import hashlib
 import json
-from typing import Any
+from typing import Any, Iterable
 
 from pyiron_workflow import NOT_DATA
 from pyiron_workflow.node import Node
@@ -26,8 +26,16 @@ def store_node_outputs(node: Node) -> str:
     output_path = f".storage/{node_hash}.hdf5"
     with HDF5Storage(output_path, "w") as storage:
         for k, v in node.outputs.items():
-            if v.value == v.default:
+            is_default_check = v.value == v.default
+            if isinstance(is_default_check, Iterable): 
+                if hasattr(is_default_check, 'all'):
+                    if is_default_check.all():
+                        continue
+                elif all(is_default_check):
+                    continue
+            elif is_default_check:
                 continue
+
             if v.value is NOT_DATA:
                 raise ValueError(f"Output '{k}' has no value.")
             storage[k] = v.value
@@ -139,6 +147,18 @@ def store_node_in_database(
     Returns:
         str: The hash of the stored node.
     """
+    if store_input_nodes_recursively:
+        connected_nodes = [
+            input.connections[0].owner for input in node.inputs if input.connected
+        ]
+        for connected_node in connected_nodes:
+            store_node_in_database(
+                db,
+                connected_node,
+                store_outputs=store_outputs,
+                store_input_nodes_recursively=store_input_nodes_recursively,
+            )
+
     node_jsongroup = node_to_jsongroup(node)
     node_hash = get_hash(node_jsongroup)
     node_dict = node_jsongroup.data
@@ -157,17 +177,6 @@ def store_node_in_database(
         output_path=output_path,
     )
     db.create(node_data)
-    if store_input_nodes_recursively:
-        connected_nodes = [
-            input.connections[0].owner for input in node.inputs if input.connected
-        ]
-        for connected_node in connected_nodes:
-            store_node_in_database(
-                db,
-                connected_node,
-                store_outputs=store_outputs,
-                store_input_nodes_recursively=store_input_nodes_recursively,
-            )
     return node_hash
 
 
