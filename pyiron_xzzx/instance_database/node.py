@@ -27,8 +27,8 @@ def store_node_outputs(node: Node) -> str:
     with HDF5Storage(output_path, "w") as storage:
         for k, v in node.outputs.items():
             is_default_check = v.value == v.default
-            if isinstance(is_default_check, Iterable): 
-                if hasattr(is_default_check, 'all'):
+            if isinstance(is_default_check, Iterable):
+                if hasattr(is_default_check, "all"):
                     if is_default_check.all():
                         continue
                 elif all(is_default_check):

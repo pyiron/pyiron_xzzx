@@ -94,9 +94,11 @@ class StorageGroup(MutableMapping[str, Any], abc.ABC):
         if isinstance(value, type) or callable(value):
             module, qualname, version = (
                 value.__module__,
-                value.__qualname__
-                if hasattr(value, "__qualname__")
-                else value.__class__.__qualname__,
+                (
+                    value.__qualname__
+                    if hasattr(value, "__qualname__")
+                    else value.__class__.__qualname__
+                ),
                 "not_defined",
             )
             group = self.create_group(key)
@@ -116,7 +118,7 @@ class StorageGroup(MutableMapping[str, Any], abc.ABC):
             for k, v in value.items():
                 group[k] = v
             return
-        
+
         if isinstance(value, bytes):
             from base64 import b64encode
 
