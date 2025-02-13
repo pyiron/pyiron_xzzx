@@ -44,6 +44,10 @@ class StorageGroup(MutableMapping[str, Any], abc.ABC):
                     obj.__setstate__(state)
                 else:
                     obj.__dict__.update(**state)
+                if group["listitems"] is not None:
+                    raise RuntimeError("listitems")
+                if group["dictitems"] is not None:
+                    raise RuntimeError("dictitems")
                 return obj
             case "tuple":
                 lst = []
@@ -67,10 +71,32 @@ class StorageGroup(MutableMapping[str, Any], abc.ABC):
                 raise TypeError(f"Could not instantiate: {type}")
 
     def _transform_value(self, key: str, value: Any) -> None:
+        def save_reduce(
+            group,
+            self,
+            func,
+            args,
+            state=None,
+            listitems=None,
+            dictitems=None,
+            state_setter=None,
+            *,
+            obj=None,
+        ):
+            group["_type"] = "pickle"
+            group["func"] = func
+            group["args"] = args
+            group["state"] = state
+            group["listitems"] = listitems
+            group["dictitems"] = dictitems
+            group["state_setter"] = state_setter
+
         if isinstance(value, type) or callable(value):
             module, qualname, version = (
                 value.__module__,
-                value.__qualname__,
+                value.__qualname__
+                if hasattr(value, "__qualname__")
+                else value.__class__.__qualname__,
                 "not_defined",
             )
             group = self.create_group(key)
@@ -90,32 +116,29 @@ class StorageGroup(MutableMapping[str, Any], abc.ABC):
             for k, v in value.items():
                 group[k] = v
             return
-
-        if hasattr(value, "__reduce__"):
-            try:
-                rv = value.__reduce__()
-            except TypeError:
-                pass
-            else:
-                if isinstance(rv, str):
-                    module, qualname, version = value.__module__, rv, "not_defined"
-                    group = self.create_group(key)
-                    group["_type"] = "global"
-                    group["_class"] = "@".join([module, qualname, version])
-                    return
-
-                func, args, state, *reminder = value.__reduce__()
-                group = self.create_group(key)
-                group["_type"] = "pickle"
-                group["func"] = func
-                group["args"] = args
-                group["state"] = state
-                return
-
+        
         if isinstance(value, bytes):
             from base64 import b64encode
 
             group = self.create_group(key)
             group["_type"] = "base64"
             group["value"] = b64encode(value).decode("utf8")
+            return
+
+        reduce = getattr(value, "__reduce_ex__", None)
+        if reduce is None:
+            reduce = getattr(value, "__reduce__", None)
+
+        if reduce is not None:
+            rv = reduce(4)
+
+            if isinstance(rv, str):
+                module, qualname, version = value.__module__, rv, "not_defined"
+                group = self.create_group(key)
+                group["_type"] = "global"
+                group["_class"] = "@".join([module, qualname, version])
+                return
+
+            group = self.create_group(key)
+            save_reduce(group, value, *rv)
             return

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import contextlib
 import json
-from types import TracebackType
+from types import NoneType, TracebackType
 from typing import Any
 
 from pyiron_xzzx.generic_storage.interface import StorageGroup
@@ -31,6 +31,10 @@ class JSONGroup(StorageGroup):
         return self.data[key]
 
     def __setitem__(self, key: str, value: Any) -> None:
+        if isinstance(value, (int, float, str, list, NoneType)):
+            self.data[key] = value
+            return
+
         self._transform_value(key, value)
 
         if key not in self:

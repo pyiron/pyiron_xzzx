@@ -63,10 +63,10 @@ class HDF5Group(StorageGroup):
                 group[f"item_{i}"] = v
             return
 
-        self._transform_value(key, value)
-
-        if key not in self:
+        try:
             self.data[key] = value
+        except TypeError:
+            self._transform_value(key, value)
 
     def __iter__(self) -> Iterator[str]:
         return iter(self.data)
