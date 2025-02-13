@@ -102,4 +102,13 @@ extend-exclude = '''
 
 [tool.mypy]
 ignore_missing_imports = true
-exclude = ['docs/conf.py', 'pyiron_xzzx/_version.py']
+exclude = [
+    'docs/conf.py',
+    '_version.py',
+]
+
+[[tool.mypy.overrides]]
+module = [
+  "pyiron_xzzx.*",
+]
+follow_imports = "skip"
