@@ -2,6 +2,7 @@ channels:
   - conda-forge
 dependencies:
   - h5py
+  - neo4j-python-driver-rust-ext
   - psycopg2
   - pyiron_workflow
   - sqlalchemy
