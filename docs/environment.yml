@@ -9,6 +9,7 @@ dependencies:
 - versioneer
 - h5py
 - neo4j-python-driver-rust-ext
+- numpy
 - psycopg2
 - pyiron_workflow
 - sqlalchemy
