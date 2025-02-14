@@ -32,7 +32,7 @@ class JSONGroup(StorageGroup):
         return self.data[key]
 
     def __setitem__(self, key: str, value: Any) -> None:
-        if isinstance(value, (int, float, str, list, NoneType)):
+        if isinstance(value, int | float | str | list | NoneType):
             self.data[key] = value
             return
 
