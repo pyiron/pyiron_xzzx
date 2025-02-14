@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import contextlib
 import pickle
+from pathlib import Path
 from types import TracebackType
 from typing import Any
 
@@ -46,11 +47,13 @@ class PickleGroup(StorageGroup):
 class PickleStorage(contextlib.AbstractContextManager[PickleGroup]):
     def __init__(self, filename: str, mode="rb") -> None:
         super().__init__()
-        self.filename = filename
+        self.filename = Path(filename)
         self.mode = mode
         self.data: dict = {}
 
     def __enter__(self) -> PickleGroup:
+        path = self.filename.parent
+        path.mkdir(parents=True, exist_ok=True)
         with open(self.filename, self.mode) as file:
             if file.readable():
                 self.data = pickle.load(file)

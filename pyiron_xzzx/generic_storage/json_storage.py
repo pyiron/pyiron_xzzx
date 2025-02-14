@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import contextlib
 import json
+from pathlib import Path
 from types import NoneType, TracebackType
 from typing import Any
 
@@ -62,11 +63,13 @@ class JSONGroup(StorageGroup):
 class JSONStorage(contextlib.AbstractContextManager[JSONGroup]):
     def __init__(self, filename: str, mode: str = "r") -> None:
         super().__init__()
-        self.filename = filename
+        self.filename = Path(filename)
         self.mode = mode
         self.data: dict[str, Any] = {}
 
     def __enter__(self) -> JSONGroup:
+        path = self.filename.parent
+        path.mkdir(parents=True, exist_ok=True)
         with open(self.filename, self.mode) as file:
             if file.readable():
                 self.data = json.loads(file.read())

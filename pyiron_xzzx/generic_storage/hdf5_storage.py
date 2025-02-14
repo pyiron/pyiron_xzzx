@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import contextlib
 from collections.abc import Iterator
+from pathlib import Path
 from types import TracebackType
 from typing import Any
 
@@ -87,6 +88,9 @@ class HDF5Group(StorageGroup):
 class HDF5Storage(contextlib.AbstractContextManager[HDF5Group]):
     def __init__(self, filename: str, mode: str = "r") -> None:
         super().__init__()
+        self.filename = Path(filename)
+        path = self.filename.parent
+        path.mkdir(parents=True, exist_ok=True)
         self.file = h5py.File(filename, mode)
         self.data = self.file
 
