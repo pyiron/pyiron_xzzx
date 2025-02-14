@@ -1,4 +1,4 @@
-# pyiron_module_template
+# Database extension for pyiron_workflow
 
 ## Instance Database Interface
 ```python
