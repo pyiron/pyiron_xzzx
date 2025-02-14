@@ -26,10 +26,10 @@ jobs:
         miniforge-version: latest
         condarc-file: .condarc
         environment-file: .ci_support/environment.yml
-    - uses: pyiron/actions/update-pyproject-dependencies@actions-3.1.0
-      with:
-        lower-bound-yaml: .ci_support/environment-old.yml
-        semantic-upper-bound: 'patch'
+    # - uses: pyiron/actions/update-pyproject-dependencies@actions-3.1.0
+    #   with:
+    #     lower-bound-yaml: .ci_support/environment-old.yml
+    #     semantic-upper-bound: 'patch'
     - name: Build
       shell: bash -l {0}
       run: |
