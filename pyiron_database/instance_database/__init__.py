@@ -1,4 +1,6 @@
-from pyiron_database.instance_database.Neo4jInstanceDatabase import Neo4jInstanceDatabase
+from pyiron_database.instance_database.Neo4jInstanceDatabase import (
+    Neo4jInstanceDatabase,
+)
 from pyiron_database.instance_database.node import (
     get_hash,
     restore_node_from_database,

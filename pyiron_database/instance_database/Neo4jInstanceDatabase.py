@@ -2,13 +2,22 @@ from __future__ import annotations
 
 from typing import NoReturn
 
-from neo4j import GraphDatabase
+try:
+    from neo4j import GraphDatabase
+
+    FAILED_IMPORT = None
+except ImportError as err:
+    FAILED_IMPORT = err.name
 
 from .InstanceDatabase import InstanceDatabase
 
 
 class Neo4jInstanceDatabase(InstanceDatabase):
     def __init__(self, uri: str, auth: tuple[str, str]) -> None:
+        if FAILED_IMPORT is not None:
+            raise ImportError(
+                f"{type(self)} requires '{FAILED_IMPORT}' to be installed."
+            )
         self.uri = uri
         self.auth = auth
         self.driver = GraphDatabase.driver(self.uri, auth=self.auth)

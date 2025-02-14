@@ -1,13 +1,24 @@
 from __future__ import annotations
 
-from sqlalchemy import Column, MetaData, String, Table, create_engine
-from sqlalchemy.dialects.postgresql import JSONB, insert
+try:
+    from sqlalchemy import Column, MetaData, String, Table, create_engine
+    from sqlalchemy.dialects.postgresql import JSONB, insert
+
+    FAILED_IMPORT = None
+except ImportError as err:
+    FAILED_IMPORT = err.name
+
 
 from .InstanceDatabase import InstanceDatabase
 
 
 class PostgreSQLInstanceDatabase(InstanceDatabase):
     def __init__(self, connection_string: str, echo: bool = False) -> None:
+        if FAILED_IMPORT is not None:
+            raise ImportError(
+                f"{type(self)} requires '{FAILED_IMPORT}' to be installed."
+            )
+
         self.metadata = MetaData()
         self.table = Table(
             "nodes",
