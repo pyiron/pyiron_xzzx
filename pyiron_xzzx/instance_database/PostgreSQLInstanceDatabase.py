@@ -24,10 +24,10 @@ class PostgreSQLInstanceDatabase(InstanceDatabase):
 
         self.engine = create_engine(connection_string, echo=echo)
 
-    def create_table(self) -> None:
+    def init(self) -> None:
         self.metadata.create_all(self.engine)
 
-    def drop_table(self) -> None:
+    def drop(self) -> None:
         self.metadata.drop_all(self.engine)
 
     def create(

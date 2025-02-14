@@ -16,13 +16,13 @@ class Neo4jInstanceDatabase(InstanceDatabase):
     def close(self) -> None:
         self.driver.close()
 
-    def create_table(self) -> None:
+    def init(self) -> None:
         with self.driver.session(database="neo4j") as session:
             session.run(
                 "CREATE INDEX node_hash_index IF NOT EXISTS FOR (n:NODE) ON (n.hash)"
             )
 
-    def drop_table(self) -> None:
+    def drop(self) -> None:
         with self.driver.session(database="neo4j") as session:
             session.run("MATCH (n) DETACH DELETE n")
 
