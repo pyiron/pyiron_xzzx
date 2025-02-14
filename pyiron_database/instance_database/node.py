@@ -7,8 +7,8 @@ from pyiron_workflow import NOT_DATA
 from pyiron_workflow.node import Node
 from pyiron_workflow.workflow import Workflow
 
-from pyiron_xzzx.generic_storage import HDF5Storage, JSONGroup
-from pyiron_xzzx.obj_reconstruction.util import get_type, recreate_obj
+from pyiron_database.generic_storage import HDF5Storage, JSONGroup
+from pyiron_database.obj_reconstruction.util import get_type, recreate_obj
 
 from .InstanceDatabase import InstanceDatabase
 

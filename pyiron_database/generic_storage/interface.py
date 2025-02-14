@@ -4,7 +4,7 @@ import abc
 from collections.abc import MutableMapping
 from typing import Any
 
-from pyiron_xzzx.obj_reconstruction.util import recreate_type
+from pyiron_database.obj_reconstruction.util import recreate_type
 
 
 class StorageGroup(MutableMapping[str, Any], abc.ABC):

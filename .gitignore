@@ -12,4 +12,4 @@ test_times.dat
 core.*
 *.hdf5
 *.json
-pyiron_xzzx.egg-info
+pyiron_database.egg-info

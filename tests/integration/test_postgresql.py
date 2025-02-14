@@ -2,7 +2,7 @@ import unittest
 
 from pyiron_workflow import Workflow
 
-from pyiron_xzzx.instance_database import (
+from pyiron_database.instance_database import (
     PostgreSQLInstanceDatabase,
     restore_node_from_database,
     restore_node_outputs,

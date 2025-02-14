@@ -3,7 +3,7 @@ from dataclasses import dataclass
 
 from pyiron_workflow import NOT_DATA
 
-from pyiron_xzzx.generic_storage import HDF5Storage, JSONStorage, PickleStorage
+from pyiron_database.generic_storage import HDF5Storage, JSONStorage, PickleStorage
 
 
 @dataclass
