@@ -7,33 +7,36 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "pyiron_database"
-description = "pyiron_database - Your pyiron-like module."
+description = "pyiron_database - Database support for pyiron_workflow."
 readme = "docs/README.md"
-keywords = [ "pyiron",]
-requires-python = ">=3.9, <3.13"
+keywords = [ "pyiron_workflow",]
+requires-python = ">=3.10, <3.13"
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Topic :: Scientific/Engineering",
     "License :: OSI Approved :: BSD License",
     "Intended Audience :: Science/Research",
     "Operating System :: OS Independent",
-    "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
 ]
 dependencies = [
     "h5py==3.12.1",
-    "neo4j-python-driver-rust-ext==5.25.0.0",
-    "psycopg2==2.9.9",
     "pyiron_workflow==0.12.0",
     "setuptools==75.8.0",
-    "sqlalchemy==2.0.38",
     "versioneer[toml]==0.29",
 ]
 dynamic = [ "version",]
 authors = [
-    { name = "Lorem Ipsum", email = "lorem@ipsum.com" },
+    { name = "Sebastian Eibl", email = "sebastian.eibl@mpcdf.mpg.de" },
+]
+
+[project.optional-dependencies]
+neo4j = ["neo4j-python-driver-rust-ext==5.25.0.0"]
+postgresql = [
+  "psycopg2==2.9.9",
+  "sqlalchemy==2.0.38",
 ]
 
 [project.license]
