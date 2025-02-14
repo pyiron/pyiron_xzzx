@@ -39,10 +39,6 @@ jobs:
           channels: conda-forge
           environment-file: .ci_support/environment.yml
 
-      - name: Install dependencies
-        shell: bash -el {0}
-        run: pip install neo4j-rust-ext
-
       - name: Run tests
         shell: bash -el {0}
         run: python -m unittest discover -v
