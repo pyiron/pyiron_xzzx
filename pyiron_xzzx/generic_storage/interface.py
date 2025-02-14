@@ -8,7 +8,7 @@ from pyiron_xzzx.obj_reconstruction.util import recreate_type
 
 
 class StorageGroup(MutableMapping[str, Any], abc.ABC):
-    """API for organizing/loading/storing stuff"""
+    """A dict like container to store arbitrary stuff."""
 
     @abc.abstractmethod
     def create_group(self, key: str) -> StorageGroup:
