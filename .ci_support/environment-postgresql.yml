@@ -3,5 +3,6 @@ channels:
 dependencies:
   - h5py =3.12.1
   - numpy =2.2.2
+  - psycopg2 =2.9.9
   - pyiron_workflow =0.12.0
-
+  - sqlalchemy =2.0.38

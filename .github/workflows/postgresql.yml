@@ -37,7 +37,7 @@ jobs:
           auto-update-conda: true
           python-version: '3.12'
           channels: conda-forge
-          environment-file: .ci_support/environment.yml
+          environment-file: .ci_support/environment-postgresql.yml
 
       - name: Run tests
         shell: bash -el {0}
