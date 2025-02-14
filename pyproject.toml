@@ -112,3 +112,7 @@ module = [
   "pyiron_xzzx.*",
 ]
 follow_imports = "skip"
+
+[tool.pydoclint]
+style = 'google'
+exclude = '_version\.py'

@@ -22,6 +22,9 @@ def store_node_outputs(node: Node) -> str:
 
     Returns:
         str: The file path where the node's outputs are stored.
+
+    Raises:
+        ValueError: If any output of the node is NOT_DATA.
     """
     node_hash = get_hash(node)
     output_path = f".storage/{node_hash}.hdf5"
@@ -48,10 +51,10 @@ def restore_node_outputs(node: Node) -> bool:
     Restore a node's outputs from a stored HDF5 file, given by node.hash.
 
     Args:
-        node: the node whose outputs should be restored.
+        node (Node): the node whose outputs should be restored.
 
     Returns:
-        True if the outputs were restored, False if not.
+        bool: True if the outputs were restored, False if not.
     """
 
     node_hash = get_hash(node)
@@ -193,12 +196,15 @@ def restore_node_from_database(
     values directly.
 
     Args:
-        db: The InstanceDatabase instance to read from.
-        node_hash: The hash of the node to restore.
-        parent: The workflow to add the restored node to.
+        db (InstanceDatabase): The InstanceDatabase instance to read from.
+        node_hash (str): The hash of the node to restore.
+        parent (Workflow | None): The workflow to add the restored node to.
 
     Returns:
-        The restored node.
+        Node: The restored node.
+
+    Raises:
+        RuntimeError: If the node with the given hash is not found in the database.
     """
     # restore node
     db_result = db.read(node_hash)
