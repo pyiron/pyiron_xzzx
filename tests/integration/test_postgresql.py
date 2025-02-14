@@ -55,7 +55,7 @@ class TestPostgreSQL(unittest.TestCase):
         restore_node_outputs(node_to_restore)
 
         self.assertEqual(node_to_restore.outputs.a.value, node_to_store.outputs.a.value)
-        self.assertEqual(node_to_restore.outputs.b.value, node_to_store.outputs.a.value)
+        self.assertEqual(node_to_restore.outputs.b.value, node_to_store.outputs.b.value)
 
 
 if __name__ == "__main__":
