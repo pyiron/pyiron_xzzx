@@ -28,17 +28,17 @@ class InstanceDatabase(abc.ABC):
     @abc.abstractmethod
     def drop(self) -> None:
         """Drop anything related to this database backend.
-        
+
         Can be called mutiple times.
         """
         pass
 
     @abc.abstractmethod
-    def create(self, node: NodeData) -> str:   
+    def create(self, node: NodeData) -> str:
         """
         Create a new entry in the database.
 
-        This method stores a new node in the database using the provided node data. 
+        This method stores a new node in the database using the provided node data.
 
         Args:
             node (NodeData): The data of the node to be created in the database.

@@ -211,7 +211,7 @@ def restore_node_from_database(
     if db_result is None:
         raise RuntimeError(f"Node with hash {node_hash} not found in database.")
 
-    def generate_random_string(length: int=20) -> str:
+    def generate_random_string(length: int = 20) -> str:
         import random
         import string
 
