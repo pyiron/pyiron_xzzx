@@ -13,6 +13,8 @@ jobs:
     secrets: inherit
     with:
       python-version-alt3: 'exclude'
+      do-coveralls: false
+      do-codacy: false
 
   mypy:
     runs-on: ubuntu-latest
