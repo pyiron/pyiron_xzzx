@@ -1,6 +1,5 @@
 [build-system]
 requires = [
-    "pyiron_workflow",
     "setuptools",
     "versioneer[toml]==0.29",
 ]
@@ -24,7 +23,13 @@ classifiers = [
     "Programming Language :: Python :: 3.12",
 ]
 dependencies = [
-    "pyiron_workflow"
+    "h5py==3.12.1",
+    "neo4j-python-driver-rust-ext==5.25.0.0",
+    "psycopg2==2.9.9",
+    "pyiron_workflow==0.12.0",
+    "setuptools==75.8.0",
+    "sqlalchemy==2.0.38",
+    "versioneer[toml]==0.29",
 ]
 dynamic = [ "version",]
 authors = [
