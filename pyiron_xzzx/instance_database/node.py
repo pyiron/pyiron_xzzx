@@ -91,6 +91,15 @@ def node_to_jsongroup(node: Node) -> JSONGroup:
 
 
 def get_hash(obj_to_be_hashed: Node | JSONGroup) -> str:
+    """
+    Calculate the hash of a given node or JSONGroup.
+
+    Args:
+        obj_to_be_hashed (Node | JSONGroup): the object whose hash should be calculated.
+
+    Returns:
+        str: the SHA-256 hash of the object.
+    """
     node_jsongroup = (
         obj_to_be_hashed
         if isinstance(obj_to_be_hashed, JSONGroup)
