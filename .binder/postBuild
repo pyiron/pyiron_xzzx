@@ -1,20 +1,20 @@
 # pip install main
 pip install --no-deps .
-# Note: This produces build and pyiron_xzzx.egg-info directories
+# Note: This produces build and pyiron_database.egg-info directories
 
 # clean up
 if [ -d "notebooks" ]; then
     mv notebooks/* .
 fi
-if [ -d "${HOME}/pyiron_xzzx" ]; then
+if [ -d "${HOME}/pyiron_database" ]; then
     rm -r   ${HOME}/.binder \
             ${HOME}/.ci_support \
             ${HOME}/.github \
             ${HOME}/build \
             ${HOME}/docs \
             ${HOME}/notebooks \
-            ${HOME}/pyiron_xzzx \
-            ${HOME}/pyiron_xzzx.egg-info \
+            ${HOME}/pyiron_database \
+            ${HOME}/pyiron_database.egg-info \
             ${HOME}/tests \
             ${HOME}/.gitattributes \
             ${HOME}/.gitignore \

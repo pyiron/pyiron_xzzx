@@ -6,8 +6,8 @@ requires = [
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "pyiron_xzzx"
-description = "pyiron_xzzx - Your pyiron-like module."
+name = "pyiron_database"
+description = "pyiron_database - Your pyiron-like module."
 readme = "docs/README.md"
 keywords = [ "pyiron",]
 requires-python = ">=3.9, <3.13"
@@ -41,24 +41,24 @@ file = "LICENSE"
 
 [project.urls]
 Homepage = "https://pyiron.org/"
-Documentation = "https://pyiron_xzzx.readthedocs.io"
-Repository = "https://github.com/pyiron/pyiron_xzzx"
+Documentation = "https://pyiron_database.readthedocs.io"
+Repository = "https://github.com/pyiron/pyiron_database"
 
 [tool.versioneer]
 VCS = "git"
 style = "pep440-pre"
-versionfile_source = "pyiron_xzzx/_version.py"
-parentdir_prefix = "pyiron_xzzx"
-tag_prefix = "pyiron_xzzx-"
+versionfile_source = "pyiron_database/_version.py"
+parentdir_prefix = "pyiron_database"
+tag_prefix = "pyiron_database-"
 
 [tool.setuptools.packages.find]
-include = [ "pyiron_xzzx*",]
+include = [ "pyiron_database*",]
 
 [tool.setuptools.dynamic.version]
-attr = "pyiron_xzzx.__version__"
+attr = "pyiron_database.__version__"
 
 [tool.ruff]
-exclude = ["docs/conf.py", "setup.py", "pyiron_xzzx/_version.py"]
+exclude = ["docs/conf.py", "setup.py", "pyiron_database/_version.py"]
 
 [tool.ruff.lint]
 select = [
@@ -114,7 +114,7 @@ exclude = [
 
 [[tool.mypy.overrides]]
 module = [
-  "pyiron_xzzx.*",
+  "pyiron_database.*",
 ]
 follow_imports = "skip"
 

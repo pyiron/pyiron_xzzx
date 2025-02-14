@@ -1,4 +1,4 @@
-.. pyiron_xzzx documentation master file
+.. pyiron_database documentation master file
 
 .. _index:
 
