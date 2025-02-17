@@ -7,8 +7,18 @@ from typing import Any
 from pyiron_database.obj_reconstruction.util import recreate_type
 
 
+def _save_join(separator, items):
+    for it in items:
+        if separator in it:
+            raise ValueError(f"Separator ({separator}) not allowed in item ({it})")
+    return separator.join(items)
+
+
 class StorageGroup(MutableMapping[str, Any], abc.ABC):
     """A dict like container to store arbitrary stuff."""
+
+    separator: str = "@"
+    undefined_version: str = "not_defined"
 
     @abc.abstractmethod
     def create_group(self, key: str) -> StorageGroup:
@@ -28,7 +38,7 @@ class StorageGroup(MutableMapping[str, Any], abc.ABC):
             case "group":
                 return group
             case "type":
-                module, qualname, version = group["_class"].split("@")
+                module, qualname, version = group["_class"].split(self.separator)
                 return recreate_type(
                     module,
                     qualname,
@@ -56,7 +66,7 @@ class StorageGroup(MutableMapping[str, Any], abc.ABC):
                     i += 1
                 return tuple(lst)
             case "global":
-                module, qualname, version = group["_class"].split("@")
+                module, qualname, version = group["_class"].split(self.separator)
                 return recreate_type(
                     module,
                     qualname,
@@ -98,11 +108,11 @@ class StorageGroup(MutableMapping[str, Any], abc.ABC):
                     if hasattr(value, "__qualname__")
                     else value.__class__.__qualname__
                 ),
-                "not_defined",
+                self.undefined_version,
             )
             group = self.create_group(key)
             group["_type"] = "type"
-            group["_class"] = "@".join([module, qualname, version])
+            group["_class"] = _save_join(self.separator, [module, qualname, version])
             return
 
         if isinstance(value, tuple):
@@ -134,10 +144,12 @@ class StorageGroup(MutableMapping[str, Any], abc.ABC):
             rv = reduce(4)
 
             if isinstance(rv, str):
-                module, qualname, version = value.__module__, rv, "not_defined"
+                module, qualname, version = value.__module__, rv, self.undefined_version
                 group = self.create_group(key)
                 group["_type"] = "global"
-                group["_class"] = "@".join([module, qualname, version])
+                group["_class"] = _save_join(
+                    self.separator, [module, qualname, version]
+                )
                 return
 
             group = self.create_group(key)
