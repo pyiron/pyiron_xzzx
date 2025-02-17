@@ -1,7 +1,6 @@
 channels:
-  - conda-forge
+- conda-forge
 dependencies:
-  - h5py =3.12.1
-  - numpy =2.2.2
-  - pyiron_workflow =0.12.0
-
+- h5py =3.12.1
+- numpy =2.2.2
+- pyiron_workflow =0.12.0
