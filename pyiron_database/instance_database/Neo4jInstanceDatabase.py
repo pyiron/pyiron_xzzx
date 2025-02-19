@@ -136,7 +136,11 @@ class Neo4jInstanceDatabase(InstanceDatabase):
             )
 
         node = records[0].data()["n"]
-        inputs = {inp["key"]: inp["value"] for inp in (rec.data()["i"] for rec in records) if inp is not None}
+        inputs = {
+            inp["key"]: inp["value"]
+            for inp in (rec.data()["i"] for rec in records)
+            if inp is not None
+        }
         connected_inputs = [
             k for k, v in inputs.items() if isinstance(v, str) and "@" in v
         ]
