@@ -53,15 +53,51 @@ class Neo4jInstanceDatabase(InstanceDatabase):
             tx.run(
                 """
                 MERGE (n :NODE {hash: $hash, name:$name, module:$module, version:$version, output_path:$output_path})
-
+                """,
+                hash=node.hash,
+                name=node.qualname,
+                module=node.module,
+                version=node.version,
+                output_path=node.output_path if node.output_path else "",
+                inp=inp,
+                out=out,
+                channels=channels,
+            )
+            tx.run(
+                """
+                MATCH (n :NODE {hash: $hash})
                 WITH n, $inp AS inp
                 UNWIND inp AS input
                 MERGE (:INPUT {key:input.key, value:input.value}) -[:INPUT]-> (n)
-
+                """,
+                hash=node.hash,
+                name=node.qualname,
+                module=node.module,
+                version=node.version,
+                output_path=node.output_path if node.output_path else "",
+                inp=inp,
+                out=out,
+                channels=channels,
+            )
+            tx.run(
+                """
+                MATCH (n :NODE {hash: $hash})
                 WITH n, $out AS out
                 UNWIND out AS output
                 MERGE (:OUTPUT {key:output.key}) <-[:OUTPUT]- (n)
-
+                """,
+                hash=node.hash,
+                name=node.qualname,
+                module=node.module,
+                version=node.version,
+                output_path=node.output_path if node.output_path else "",
+                inp=inp,
+                out=out,
+                channels=channels,
+            )
+            tx.run(
+                """
+                MATCH (n :NODE {hash: $hash})
                 WITH n AS input_node, $channels AS channels
                 UNWIND channels AS channel
                 MATCH (output_node:NODE {hash: channel.output_hash}) -[:OUTPUT]-> (o:OUTPUT {key:channel.output_channel})
@@ -84,7 +120,9 @@ class Neo4jInstanceDatabase(InstanceDatabase):
         def node_graph(tx, hash: str):
             result = tx.run(
                 """
-                MATCH (i) --> (n {hash:$hash}) --> (o)
+                MATCH (n {hash:$hash})
+                OPTIONAL MATCH (n) --> (o)
+                OPTIONAL MATCH (n) <-- (i)
                 RETURN n, o, i
                 """,
                 hash=hash,
@@ -98,7 +136,7 @@ class Neo4jInstanceDatabase(InstanceDatabase):
             )
 
         node = records[0].data()["n"]
-        inputs = {rec.data()["i"]["key"]: rec.data()["i"]["value"] for rec in records}
+        inputs = {inp["key"]: inp["value"] for inp in (rec.data()["i"] for rec in records) if inp is not None}
         connected_inputs = [
             k for k, v in inputs.items() if isinstance(v, str) and "@" in v
         ]
