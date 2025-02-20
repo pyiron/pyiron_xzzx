@@ -161,5 +161,12 @@ class Neo4jInstanceDatabase(InstanceDatabase):
     def update(self, hash: str, **kwargs) -> NoReturn:
         raise NotImplementedError
 
-    def delete(self, hash: str) -> NoReturn:
-        raise NotImplementedError
+    def delete(self, hash: str) -> None:
+        with self.driver.session(database="neo4j") as session:
+            session.run(
+                """
+                MATCH (i: INPUT) -[:INPUT]-> (n {hash:$hash}) -[:OUTPUT]-> (o: OUTPUT) 
+                DETACH DELETE n, i , o
+                """,
+                hash=hash,
+            )
