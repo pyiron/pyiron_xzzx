@@ -12,7 +12,7 @@ from pyiron_database.generic_storage.interface import StorageGroup
 
 
 class HDF5Group(StorageGroup):
-    def __init__(self, data: h5py.File) -> None:
+    def __init__(self, data: h5py.File | h5py.Group) -> None:
         self.data = data
 
     def __contains__(self, item: object) -> bool:
